@@ -1,28 +1,32 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { withStyles } from '@material-ui/core/styles';
+import AppNavBar from "./view/Base/AppNavBar";
+import MyPetView from "./view/Pet/MyPetView";
+
+const styleSheet = {
+  content: {
+    marginTop: "68px",
+  }
+}
 
 class App extends Component {
+  constructor(props, context){
+    super(props, context);
+    this.props = props;
+  }
+  
   render() {
+    const { classes } = this.props;
+
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <AppNavBar title="Pet Health App"/>
+        <div className={classes.content}>
+          <MyPetView />
+        </div>
       </div>
     );
   }
 }
 
-export default App;
+export default  withStyles(styleSheet)(App);
