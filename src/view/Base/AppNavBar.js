@@ -12,7 +12,6 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
 import Favorite from '@material-ui/icons/Favorite';
 import Pets from '@material-ui/icons/Pets';
 import Map from '@material-ui/icons/Map';
@@ -20,8 +19,7 @@ import Store from '@material-ui/icons/Store';
 import Exit from '@material-ui/icons/ExitToApp';
 import Phone from '@material-ui/icons/PhoneInTalk';
 import Settings from '@material-ui/icons/Settings';
-
-import MenuDrawer from './MenuDrawer';
+import { Link, hashHistory } from 'react-router';
 
 
 const styleSheet = {
@@ -62,42 +60,47 @@ class AppNavBar extends Component {
     this.setState(this.state);
   }
 
+  handleChange(page){ 
+    let uri = "/"+page;
+    hashHistory.push(uri);
+  }
+
   render(){
     const { classes } = this.props;
 
     const sideList = (
       <div className={classes.list}>
         <List>
-            <ListItem button>
-              <ListItemIcon>
-                <Pets />
-              </ListItemIcon>
-              <ListItemText primary={"Meu Pet"} />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <Favorite />
-              </ListItemIcon>
-              <ListItemText primary={"Saúde"} />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <Map />
-              </ListItemIcon>
-              <ListItemText primary={"Locais"} />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <Store />
-              </ListItemIcon>
-              <ListItemText primary={"Serviços"} />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <Phone />
-              </ListItemIcon>
-              <ListItemText primary={"Emergência"} />
-            </ListItem>
+          <ListItem button onClick={()=>{this.handleChange("")}}>
+            <ListItemIcon>
+              <Pets />
+            </ListItemIcon>
+            <ListItemText primary={"Meu Pet"} />
+          </ListItem>
+          <ListItem button onClick={()=>{this.handleChange("health")}}>
+            <ListItemIcon>
+              <Favorite />
+            </ListItemIcon>
+            <ListItemText primary={"Saúde"} />
+          </ListItem>
+          <ListItem button onClick={()=>{this.handleChange("local")}}>
+            <ListItemIcon>
+              <Map />
+            </ListItemIcon>
+            <ListItemText primary={"Locais"} />
+          </ListItem>
+          <ListItem button onClick={()=>{this.handleChange("petService")}}>
+            <ListItemIcon>
+              <Store />
+            </ListItemIcon>
+            <ListItemText primary={"Serviços"} />
+          </ListItem>
+          <ListItem button>
+            <ListItemIcon>
+              <Phone />
+            </ListItemIcon>
+            <ListItemText primary={"Emergência"} />
+          </ListItem>
         </List>
         <Divider />
         <List>
@@ -121,7 +124,7 @@ class AppNavBar extends Component {
     return(
       <div className={classes.root}>
         <AppBar position="fixed">
-          <Toolbar variant="dense" className={classes.appBar} style={{backgroundColor: "#9cf4e6"}}>
+          <Toolbar variant="dense" className={classes.appBar}>
             <IconButton className={classes.menuButton} onClick={()=>{this.handleClick(true)}}color="inherit" aria-label="Menu">
               <MenuIcon />
             </IconButton>

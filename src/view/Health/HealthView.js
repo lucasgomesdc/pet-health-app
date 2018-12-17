@@ -6,7 +6,7 @@ const styleSheet = {
 
 }
 
-class ComponentBasis extends Component {
+class HealthView extends Component {
   constructor(props, context){
     super(props, context);
     this.props = props;
@@ -22,12 +22,12 @@ class ComponentBasis extends Component {
     const { classes } = this.props;
     return(
       <div>
-        <Typography component="h2" variant="display1" gutterBottom>
-          Componente Basico de Replicação
+        <Typography variant="h2" gutterBottom>
+          Health View
         </Typography>
       </div>
     );
   }
 }
 
-export default withStyles(styleSheet)(ComponentBasis);
+export default withStyles(styleSheet)(HealthView);

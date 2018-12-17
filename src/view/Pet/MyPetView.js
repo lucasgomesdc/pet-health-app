@@ -6,12 +6,13 @@ import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography'
 
 
 const styleSheet = {
   bigAvatar: {
-    width: "180px",
-    height: "180px",
+    width: "150px",
+    height: "150px",
   },
   row: {
     display: 'flex',
@@ -27,6 +28,15 @@ const styleSheet = {
   },
   textField: {
     width:"90%"
+  },
+  title: {
+    paddingLeft: "7%",
+    fontSize: "0.96em",
+    fontWeight: "bolder"
+  }, 
+  divider: {
+    marginTop: "8px",
+    marginBottom: "8px"
   }
 }
 
@@ -55,7 +65,7 @@ class MyPetView extends Component {
   render(){
     const { classes } = this.props;
     return(
-      <Paper className={classes.cardContent}>
+      <div>
         <div className={classes.row}>
           <Avatar
             alt="Pet Picture"
@@ -64,8 +74,15 @@ class MyPetView extends Component {
           >
             <Camera className={classes.icon}/>
           </Avatar>
-          
         </div>
+        <div className={classes.row}>
+          <Button color="primary" style={{fontWeight: "bold"}}>
+            Trocar Foto
+          </Button> 
+        </div>
+        <Typography variant="h6" className={classes.title} gutterBottom>
+          Profile
+        </Typography>
         <div className={classes.row}>
           <TextField
             id="petname"
@@ -111,12 +128,34 @@ class MyPetView extends Component {
             onChange={this.handleChange('location')}
           />
         </div>
+        <Divider className={classes.divider}/>
+        <Typography variant="h6" className={classes.title} gutterBottom>
+          Informações de Contato
+        </Typography>
         <div className={classes.row}>
-          <Button variant="contained" color="primary">
+          <TextField
+            id="phone"
+            label="Telefone"
+            value={this.state.location}
+            className={classes.textField}
+            onChange={this.handleChange('location')}
+          />
+        </div>
+        <div className={classes.row}>
+          <TextField
+            id="email"
+            label="E-mail"
+            value={this.state.location}
+            className={classes.textField}
+            onChange={this.handleChange('location')}
+          />
+        </div>
+        <div className={classes.row}>
+          <Button variant="outlined" color="primary">
             Salvar
           </Button>
         </div>
-      </Paper>
+        </div>
     );
   }
 }

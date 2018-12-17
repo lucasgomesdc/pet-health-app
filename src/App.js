@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import AppNavBar from "./view/Base/AppNavBar";
 import MyPetView from "./view/Pet/MyPetView";
+import Routes from './routes';
 
 const styleSheet = {
   content: {
@@ -22,7 +23,7 @@ class App extends Component {
       <div className="App">
         <AppNavBar title="Pet Health App"/>
         <div className={classes.content}>
-          <MyPetView />
+          <Routes />
         </div>
       </div>
     );
