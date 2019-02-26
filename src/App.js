@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import AppNavBar from "./view/Base/AppNavBar";
 import MyPetView from "./view/Pet/MyPetView";
 import Routes from './routes';
+import AppBottomBar from './view/Base/AppBottomBar';
 
 const styleSheet = {
   content: {
@@ -25,6 +26,7 @@ class App extends Component {
         <div className={classes.content}>
           <Routes />
         </div>
+        <AppBottomBar />
       </div>
     );
   }
