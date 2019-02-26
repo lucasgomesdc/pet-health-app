@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import AppNavBar from "./view/Base/AppNavBar";
 import MyPetView from "./view/Pet/MyPetView";
 import Routes from './routes';
 import AppBottomBar from './view/Base/AppBottomBar';
+import { HashRouter } from 'react-router-dom';
 
 const styleSheet = {
   content: {
@@ -21,13 +21,14 @@ class App extends Component {
     const { classes } = this.props;
 
     return (
-      <div className="App">
-        <AppNavBar title="Pet Health App"/>
-        <div className={classes.content}>
-          <Routes />
+      <HashRouter>
+        <div className="App">
+          <div className={classes.content}>
+            <Routes />
+          </div>
+          <AppBottomBar />
         </div>
-        <AppBottomBar />
-      </div>
+      </HashRouter>
     );
   }
 }
