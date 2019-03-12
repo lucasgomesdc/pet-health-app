@@ -48,7 +48,7 @@ class AppBottomBar extends Component {
         <BottomNavigationAction className={classes.menuNav} component={Link} to="/" value="" icon={<Pets />} />
         <BottomNavigationAction className={classes.menuNav} component={Link} to="/health" value="health" icon={<FavoriteIcon />} />
         <BottomNavigationAction className={classes.menuNav} component={Link} to="/local" value="local" icon={<Map />} />
-        <BottomNavigationAction className={classes.menuNav} component={Link} to="/petService" value="petService" icon={<Store />} />
+        <BottomNavigationAction className={classes.menuNav} component={Link} to="/petService" value="petService" icon={<Settings />} />
       </BottomNavigation>
     );
   }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import MyPetView from "./view/Pet/MyPetView";
+import AppTopBar from "./view/Base/AppTopBar";
 import Routes from './routes';
 import AppBottomBar from './view/Base/AppBottomBar';
 import { HashRouter } from 'react-router-dom';
@@ -23,6 +23,7 @@ class App extends Component {
     return (
       <HashRouter>
         <div className="App">
+          <AppTopBar />
           <div className={classes.content}>
             <Routes />
           </div>

@@ -2,41 +2,33 @@ import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import Camera from '@material-ui/icons/CameraAlt';
+import Call from '@material-ui/icons/Call';
+import Pets from '@material-ui/icons/Pets';
+import Person from '@material-ui/icons/Person';
+import SdStorage from '@material-ui/icons/SdStorage';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography'
+import Fab from '@material-ui/core/Fab';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCoffee } from '@fortawesome/pro-light-svg-icons'
 
 
 const styleSheet = {
   bigAvatar: {
+    marginLeft: "20px",
     width: "150px",
     height: "150px",
+    fontSize: "40px"
   },
   row: {
     display: 'flex',
-    justifyContent: 'center',
     padding: "8px"
   },
-  icon: {
+  cameraIcon: { 
     fontSize: "40px"
-  },
-  cardContent:{
-    marginLeft: "8px",
-    marginRight: "8px",
-  },
-  textField: {
-    width:"90%"
-  },
-  title: {
-    paddingLeft: "7%",
-    fontSize: "0.96em",
-    fontWeight: "bolder"
-  }, 
-  divider: {
-    marginTop: "8px",
-    marginBottom: "8px"
   }
 }
 
@@ -45,22 +37,17 @@ class MyPetView extends Component {
     super(props, context);
     this.props = props;
     this.state = {
-      petName: "",
-      ownerName: "",
-      breed: "",
-      born: "",
-      location: "",
+      petName: "Chiquinho",
+      ownerName: "Lucas",
+      breed: "Sim",
+      chip: "123456789012345",
+      born: "01/01/2017",
+      location: "Belo Horizonte - MG",
     }
   }
 
   componentDidMount() {
   }
-
-  handleChange = name => event => {
-    this.setState({
-      [name]: event.target.value,
-    });
-  };
 
   render(){
     const { classes } = this.props;
@@ -72,90 +59,39 @@ class MyPetView extends Component {
             src=""
             className={classes.bigAvatar}
           >
-            <Camera className={classes.icon}/>
+            <Camera className={classes.cameraIcon}/>
           </Avatar>
+          <div style={{textAlign: "right", width: "100%", padding: "15px 20px 0px 0px"}}>
+            <Typography style={{fontWeight: "500"}} component="h2" variant="headline" gutterBottom>
+              {this.state.petName}
+            </Typography>
+            <Typography style={{color: "gray"}} variant="body1" gutterBottom>
+              {this.state.chip}
+            </Typography>
+            <Typography style={{marginBottom: "unset"}} variant="subheading" gutterBottom>
+              {this.state.ownerName}
+            </Typography>
+            <Typography variant="subheading" gutterBottom>
+              {this.state.location}
+            </Typography>
+          </div>
         </div>
-        <div className={classes.row}>
-          <Button color="primary" style={{fontWeight: "bold"}}>
-            Trocar Foto
-          </Button> 
+        <div style={{padding: "20px", textAlign: "center"}}>
+          <Fab
+            variant="extended"
+            size="medium"
+            style={{backgroundColor: "#4caf50", color: "white", width: "188px"}}
+            aria-label="Add"
+            className={classes.margin}
+          >
+            <Call />
+            Emergência
+          </Fab>
         </div>
-        <Typography variant="h6" className={classes.title} gutterBottom>
-          Profile
-        </Typography>
-        <div className={classes.row}>
-          <TextField
-            id="petname"
-            label="Nome do Pet"
-            value={this.state.petName}
-            className={classes.textField}
-            onChange={this.handleChange('petName')}
-          />
+        <div style={{padding: "50px"}}>
+          <FontAwesomeIcon icon={faCoffee} />
         </div>
-        <div className={classes.row}>
-          <TextField
-            id="ownerName"
-            label="Nome do Dono"
-            value={this.state.ownerName}
-            className={classes.textField}
-            onChange={this.handleChange('ownerName')}
-          />
-        </div>
-        <div className={classes.row}>
-          <TextField
-            id="breed"
-            label="Raça do Pet"
-            value={this.state.breed}
-            className={classes.textField}
-            onChange={this.handleChange('breed')}
-          />
-        </div>
-        <div className={classes.row}>
-          <TextField
-            id="born"
-            label="Nascimento do Pet"
-            value={this.state.born}
-            className={classes.textField}
-            onChange={this.handleChange('born')}
-          />
-        </div>
-        <div className={classes.row}>
-          <TextField
-            id="location"
-            label="Localização"
-            value={this.state.location}
-            className={classes.textField}
-            onChange={this.handleChange('location')}
-          />
-        </div>
-        <Divider className={classes.divider}/>
-        <Typography variant="h6" className={classes.title} gutterBottom>
-          Informações de Contato
-        </Typography>
-        <div className={classes.row}>
-          <TextField
-            id="phone"
-            label="Telefone"
-            value={this.state.location}
-            className={classes.textField}
-            onChange={this.handleChange('location')}
-          />
-        </div>
-        <div className={classes.row}>
-          <TextField
-            id="email"
-            label="E-mail"
-            value={this.state.location}
-            className={classes.textField}
-            onChange={this.handleChange('location')}
-          />
-        </div>
-        <div className={classes.row}>
-          <Button variant="outlined" color="primary">
-            Salvar
-          </Button>
-        </div>
-        </div>
+      </div>
     );
   }
 }
