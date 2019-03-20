@@ -7,9 +7,26 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import ArrowBack from '@material-ui/icons/NavigateBefore';
 import Slide from '@material-ui/core/Slide';
+import Assignment from '@material-ui/icons/Assignment';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import Event from '@material-ui/icons/Event';
 
 const styleSheet = {
-
+  registryVacine: {
+    width: "100%", 
+    position: "fixed", 
+    marginTop:"64px", 
+    backgroundColor: "white"
+  },
+  inputDesign: {
+    width: "calc(100% - 50px)"
+  },
+  iconDesign: {
+    height: "100%", 
+    marginTop: "24px", 
+    marginRight: "8px"
+  }
 }
 
 function Transition(props) {
@@ -47,6 +64,29 @@ class VacinesDialog extends Component {
               </Typography>
             </Toolbar>
           </AppBar>
+          <div id="registryVacine" className={classes.registryVacine}>
+            <Typography variant="title" gutterBottom style={{marginTop: "8px", textAlign: "center"}}>
+              Novo Registro de Vacine
+            </Typography>
+            <div style={{padding: "0px 8px"}}>
+              <Assignment className={classes.iconDesign} />
+              <TextField label="Nome da Vacina" className={classes.inputDesign} />
+            </div>
+            <div style={{padding: "0px 8px"}}>
+              <Event className={classes.iconDesign} />
+              <TextField label="Data Aplicação" style={{width: "calc(50% - 50px)", marginRight: "16px"}} />
+              <Event className={classes.iconDesign} />
+              <TextField label="Data Reaplicação" style={{width: "calc(50% - 50px)"}}/>
+            </div>   
+            <div style={{textAlign: "center", marginTop: "16px"}}>
+              <Button variant="outlined" color="primary" style={{fontWeight: "bold", margin: "0px 6px 0px 6px"}}>
+                Salvar
+              </Button>
+              <Button variant="outlined" color="secondary" style={{fontWeight: "bold", margin: "0px 6px 0px 6px"}}>
+                Limpar
+              </Button>
+            </div>         
+          </div>
         </Dialog>
       </div>
     );

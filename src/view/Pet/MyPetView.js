@@ -13,7 +13,6 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography'
 import Fab from '@material-ui/core/Fab';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCoffee } from '@fortawesome/pro-light-svg-icons'
 
 
 const styleSheet = {
@@ -89,7 +88,6 @@ class MyPetView extends Component {
           </Fab>
         </div>
         <div style={{padding: "50px"}}>
-          <FontAwesomeIcon icon={faCoffee} />
         </div>
       </div>
     );

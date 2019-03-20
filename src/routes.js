@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch , Route, } from 'react-router';
+import { Switch , Route } from 'react-router';
 
 import MyPetView from './view/Pet/MyPetView';
 import HealthView from './view/Health/HealthView';

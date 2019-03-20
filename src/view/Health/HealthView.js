@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUtensils } from '@fortawesome/pro-light-svg-icons'
 import { faSyringe } from '@fortawesome/pro-light-svg-icons'
 import { faCapsules } from '@fortawesome/pro-light-svg-icons'
+import Typography from '@material-ui/core/Typography';
+
 import LunchDialog from './LunchDialog';
 import MedicinesDialog from './MedicinesDialog';
 import VacinesDialog from './VacinesDialog';
@@ -40,7 +42,10 @@ class HealthView extends Component {
 
     return(
       <div style={{flexGrow: 1}}>
-        <Grid container spacing={8}  style={{width: "unset", margin: "unset"}}>
+        <Typography variant="body2" gutterBottom style={{fontWeight: "600", textAlign: "center"}}>
+          Escolha qual funcionalidade deseja usar
+        </Typography>
+        <Grid container spacing={8}  style={{width: "unset", margin: "unset", paddingRight: "8px", paddingLeft: "8px"}}>
           <Grid item xs={6}>
             <Paper onClick={()=>{this.handleClickOpen("lunch")}} className={classes.paper} style={{padding: "40px 0px 40px 0px", backgroundColor: "#ff7043"}}>
               <div style={{textAlign: "center", fontSize: "3rem", color: "white"}}><FontAwesomeIcon icon={faUtensils} /></div>
