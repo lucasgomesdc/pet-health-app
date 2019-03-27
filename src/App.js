@@ -4,6 +4,7 @@ import AppTopBar from "./view/Base/AppTopBar";
 import Routes from './routes';
 import AppBottomBar from './view/Base/AppBottomBar';
 import { HashRouter } from 'react-router-dom';
+import { isAuthenticated } from './library/auth';
 
 const styleSheet = {
   content: {
@@ -22,13 +23,19 @@ class App extends Component {
 
     return (
       <HashRouter>
-        <div className="App">
-          <AppTopBar />
-          <div className={classes.content}>
+        {isAuthenticated() ?
+          <div className="App">
+            <AppTopBar />
+            <div className={classes.content}>
+              <Routes />
+            </div>
+            <AppBottomBar />
+          </div>
+          :
+          <div className="App">
             <Routes />
           </div>
-          <AppBottomBar />
-        </div>
+        }
       </HashRouter>
     );
   }
