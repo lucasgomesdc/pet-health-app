@@ -5,6 +5,7 @@ import Routes from './routes';
 import AppBottomBar from './view/Base/AppBottomBar';
 import { HashRouter } from 'react-router-dom';
 import { isAuthenticated } from './library/auth';
+import constants from './Constants';
 
 const styleSheet = {
   content: {

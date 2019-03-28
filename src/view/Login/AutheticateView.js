@@ -8,6 +8,7 @@ import TextField from '@material-ui/core/TextField';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Lock from '@material-ui/icons/Lock';
 import Button from '@material-ui/core/Button';
+import AuthenticateApiService from '../../service/AuthenticateApiService';
 
 const styleSheet = {
   backgroundLogo: {
@@ -81,7 +82,18 @@ class AuthenticateView extends Component {
   };
 
   requestSign(){
-    console.log("aqui loga");
+    let prepareObj = {
+      email: this.state.emailLogin,
+      password: this.state.passwordLogin
+    }
+
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjOWMxOWEwZmFhNmYzMmM2NDdmYThmNSIsImVtYWlsIjoibHVjYXNnb21lczc4QGdtYWlsLmNvbSIsImlhdCI6MTU1Mzc0MTQwOCwiZXhwIjoxNTU2MzMzNDA4fQ.DfhQgMylDrFqBOQOydNYRbkf6YSxc47rDWgpZpRMEp4";
+
+    AuthenticateApiService.requestLogin(prepareObj, token).then((result)=>{
+      console.log(result);
+    }).catch((err)=>{
+      console.log("Erro: ", err);
+    })
   }
 
   requestRegister(){
@@ -101,11 +113,11 @@ class AuthenticateView extends Component {
           </div>
           <div className={classes.inputDesign}>
             <AccountCircle className={classes.iconDesign}/>
-            <TextField id="input-with-icon-grid" label="E-mail" className={classes.textFieldDesign} onChange={this.handleChangeInput('emailLogin')}/>
+            <TextField label="E-mail" className={classes.textFieldDesign} onChange={this.handleChangeInput('emailLogin')}/>
           </div>
           <div className={classes.inputDesign}>
             <Lock className={classes.iconDesign}/>
-            <TextField id="input-with-icon-grid" label="Senha" className={classes.textFieldDesign} type={'password'} onChange={this.handleChangeInput('passwordLogin ')}/>
+            <TextField label="Senha" className={classes.textFieldDesign} type={'password'} onChange={this.handleChangeInput('passwordLogin')}/>
           </div>
           <div style={{textAlign: "center", margin: "12px 0px 12px 0px"}}>
             <Button onClick={()=>this.requestSign()} variant="contained" color="primary">
@@ -126,16 +138,16 @@ class AuthenticateView extends Component {
             </Typography>
           </div>
           <div className={classes.inputDesign}>
-            <TextField id="input-with-icon-grid" label="Nome" className={classes.textFieldRegister} onChange={this.handleChangeInput('nameRegister')}/>
+            <TextField label="Nome" className={classes.textFieldRegister} onChange={this.handleChangeInput('nameRegister')}/>
           </div>
           <div className={classes.inputDesign}>
-            <TextField id="input-with-icon-grid" label="E-mail" className={classes.textFieldRegister} onChange={this.handleChangeInput('emailRegister')}/>
+            <TextField label="E-mail" className={classes.textFieldRegister} onChange={this.handleChangeInput('emailRegister')}/>
           </div>
           <div className={classes.inputDesign}>
-            <TextField id="input-with-icon-grid" label="Repita a senha" className={classes.textFieldRegister} type={'password'} onChange={this.handleChangeInput('passwordRegister')}/>
+            <TextField label="Repita a senha" className={classes.textFieldRegister} type={'password'} onChange={this.handleChangeInput('passwordRegister')}/>
           </div>
           <div className={classes.inputDesign}>
-            <TextField id="input-with-icon-grid" label="Repita a senha" className={classes.textFieldRegister} type={'password'} onChange={this.handleChangeInput('repeatPasswordRegister')}/>
+            <TextField label="Repita a senha" className={classes.textFieldRegister} type={'password'} onChange={this.handleChangeInput('repeatPasswordRegister')}/>
           </div>
           <div style={{textAlign: "center", margin: "24px 0px 12px 0px"}} >
             <Button onClick={()=>this.requestRegister()} variant="contained" color="primary">
