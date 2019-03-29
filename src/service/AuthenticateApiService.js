@@ -1,15 +1,16 @@
-import fetch from '../library/fetchWithTimeout'
+import fetchWithTimeout from '../library/fetchWithTimeout';
+import axios from "axios";
 
 class AuthenticateApiService { 
-	requestLogin(user, token){
+	requestLogin(user){
+		let test1 = JSON.stringify(user);
 		return new Promise((resolve, reject) =>{
 			fetch(global.API_ENDPOINT + '/auth/login', {
 				method: "POST", 
 				headers: {
-					"Content-Type": "application/json; charset=utf-8",
-					"Authorization": 'Bearer' + token
+					"Content-Type": "application/json",
 				},
-				body: user
+				body: JSON.stringify(user)
 			}).then((result)=>{
 				result.json().then((userAuth)=>{
 					resolve(userAuth);
@@ -22,9 +23,11 @@ class AuthenticateApiService {
 
 	requestRegister(user){
 		return new Promise((resolve, reject) =>{
-			fetch(global.API_ENDPOINT + '/auth/register', {
+			fetchWithTimeout(global.API_ENDPOINT + '/auth/register', {
 				method: "POST", 
-				headers: {"Content-Type": "application/json; charset=utf-8"},
+				headers: {
+					"Content-Type": "application/json; charset=utf-8",
+				},
 				body: JSON.stringify(user)
 			}).then((result)=>{
 				result.json().then((userAuth)=>{

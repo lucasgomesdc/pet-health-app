@@ -87,9 +87,16 @@ class AuthenticateView extends Component {
       password: this.state.passwordLogin
     }
 
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjOWMxOWEwZmFhNmYzMmM2NDdmYThmNSIsImVtYWlsIjoibHVjYXNnb21lczc4QGdtYWlsLmNvbSIsImlhdCI6MTU1Mzc0MTQwOCwiZXhwIjoxNTU2MzMzNDA4fQ.DfhQgMylDrFqBOQOydNYRbkf6YSxc47rDWgpZpRMEp4";
+    AuthenticateApiService.requestLogin(prepareObj).then((result)=>{
+      let user = {
+        id: result.user._id,
+        nome: result.user.name,
+      }
+      let jwt = result.token;
 
-    AuthenticateApiService.requestLogin(prepareObj, token).then((result)=>{
+      localStorage.setItem('token', jwt);
+      localStorage.setItem('user', JSON.stringify(user));
+      this.props.history.push('/');
       console.log(result);
     }).catch((err)=>{
       console.log("Erro: ", err);

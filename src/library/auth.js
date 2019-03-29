@@ -1,5 +1,5 @@
 export const isAuthenticated = () => {
-    let user = JSON.parse(localStorage.getItem('user'));
+    let user = localStorage.getItem('token');
     if(user && (user.jwt != false || user.jwt != "")) {
         return true;
     } else {
