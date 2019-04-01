@@ -22,10 +22,7 @@ const styleSheet = {
 class AppTopBar extends Component {
   constructor(props, context){
     super(props, context);
-    this.props = props;
-    this.state = {
-
-    }
+    this.props = props;    
   }
 
   componentDidMount() {

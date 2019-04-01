@@ -1,5 +1,4 @@
 import fetchWithTimeout from '../library/fetchWithTimeout';
-import axios from "axios";
 
 class AuthenticateApiService { 
 	requestLogin(user){

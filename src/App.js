@@ -17,6 +17,22 @@ class App extends Component {
   constructor(props, context){
     super(props, context);
     this.props = props;
+
+    this.state = {
+      showBar: false,
+    }
+
+    this.showBarFn = (event)=>{this.showBar(event.detail)};
+    window.addEventListener('showBar', this.showBarFn)
+  }
+
+  componentWillUnmount(){
+    window.removeEventListener('showBar', this.showBarFn);
+  }
+
+  showBar(option) {
+    this.state.showBar = option;
+    this.setState(this.state);
   }
   
   render() {
@@ -24,7 +40,7 @@ class App extends Component {
 
     return (
       <HashRouter>
-        {isAuthenticated() ?
+        {this.state.showBar ?
           <div className="App">
             <AppTopBar />
             <div className={classes.content}>

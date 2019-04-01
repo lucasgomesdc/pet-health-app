@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 
-import Icon from '@material-ui/core/Icon';
-import RestoreIcon from '@material-ui/icons/Restore';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
 import LocalCard from './LocalCard';
+import { customEvent } from '../../library';
 
 const styleSheet = {
   bottomMenu: {
@@ -27,6 +23,7 @@ class LocalView extends Component {
   }
 
   componentDidMount() {
+    customEvent('showBar', true);
   }
 
   handleChange = (event, value) => {

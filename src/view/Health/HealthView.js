@@ -7,6 +7,7 @@ import { faUtensils } from '@fortawesome/pro-light-svg-icons'
 import { faSyringe } from '@fortawesome/pro-light-svg-icons'
 import { faCapsules } from '@fortawesome/pro-light-svg-icons'
 import Typography from '@material-ui/core/Typography';
+import { customEvent } from '../../library';
 
 import LunchDialog from './LunchDialog';
 import MedicinesDialog from './MedicinesDialog';
@@ -25,6 +26,7 @@ class HealthView extends Component {
   }
 
   componentDidMount() {
+    customEvent('showBar', true);
   }
 
   handleClickOpen(value){
@@ -63,9 +65,9 @@ class HealthView extends Component {
           </Grid>
         </Grid>
 
-        <LunchDialog open={this.state.categoryOpen == "lunch" ? true : false} close={()=> this.handleClose()}/>
-        <MedicinesDialog open={this.state.categoryOpen == "medicines" ? true : false} close={()=> this.handleClose()}/>
-        <VacinesDialog open={this.state.categoryOpen == "vacines" ? true : false} close={()=> this.handleClose()}/>
+        <LunchDialog open={this.state.categoryOpen === "lunch" ? true : false} close={()=> this.handleClose()}/>
+        <MedicinesDialog open={this.state.categoryOpen === "medicines" ? true : false} close={()=> this.handleClose()}/>
+        <VacinesDialog open={this.state.categoryOpen === "vacines" ? true : false} close={()=> this.handleClose()}/>
       </div>
     );
   }

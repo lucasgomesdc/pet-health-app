@@ -29,7 +29,7 @@ class AppBottomBar extends Component {
     super(props, context);
     this.props = props;
     this.state = {
-      value: 'recents'
+      value: 'recents',
     };
   }
 

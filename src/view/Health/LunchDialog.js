@@ -15,13 +15,10 @@ import Grid from '@material-ui/core/Grid';
 import Assignment from '@material-ui/icons/Assignment';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
-
-
-/* PAPER */
 import Paper from '@material-ui/core/Paper';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-
+import { customEvent } from '../../library';
 
 const styleSheet = {
   appBar: {
@@ -73,7 +70,8 @@ class LunchDialog extends Component {
   }
 
   componentDidMount() {
-  }  
+    customEvent('showBar', true);
+  }
 
   handleChange = name => event => {
     if(name == "checkedTodos"){

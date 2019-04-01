@@ -13,6 +13,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography'
 import Fab from '@material-ui/core/Fab';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { customEvent } from '../../library';
 
 
 const styleSheet = {
@@ -46,6 +47,7 @@ class MyPetView extends Component {
   }
 
   componentDidMount() {
+    customEvent('showBar', true);
   }
 
   render(){

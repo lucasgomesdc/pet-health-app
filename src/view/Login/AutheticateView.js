@@ -126,12 +126,18 @@ class AuthenticateView extends Component {
             <Lock className={classes.iconDesign}/>
             <TextField label="Senha" className={classes.textFieldDesign} type={'password'} onChange={this.handleChangeInput('passwordLogin')}/>
           </div>
-          <div style={{textAlign: "center", margin: "12px 0px 12px 0px"}}>
-            <Button onClick={()=>this.requestSign()} variant="contained" color="primary">
+          <div>
+            <Typography variant="body2" gutterBottom style={{textAlign: "center", fontWeight: "600"}}>
+              Erro ao entrar - Usuário ou senha invalida!
+            </Typography>
+          </div>
+          <div style={{textAlign: "center", margin: "8px 0px"}}>
+            <Button onClick={()=>this.requestSign()} variant="contained" color="primary" style={{width: "calc(100% - 50px)"}}>
               Entrar
             </Button>
           </div>
-          <div style={{textAlign: "center", margin: "12px 0px 12px 0px"}}>  
+          <div style={{textAlign: "center"}}>
+              Não tem uma conta? 
             <Button onClick={()=>{this.handleChangeView("register")}} color="primary" style={{fontWeight: "600"}}>
               Registrar
             </Button>

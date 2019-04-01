@@ -5,7 +5,7 @@ import { isAuthenticated } from './library/auth';
 import MyPetView from './view/Pet/MyPetView';
 import HealthView from './view/Health/HealthView';
 import LocalView from './view/Locals/LocalView';
-import PetServiceView from './view/PetServices/PetServiceView';
+import PetSettingsView from './view/PetServices/PetSettingsView';
 import AuthenticateView from './view/Login/AutheticateView';
 
 const PrivateRoute = ({ component: Component, ...rest}) => (
@@ -26,7 +26,7 @@ const Routes = () => (
     <PrivateRoute exact path='/' component={MyPetView}/>
     <PrivateRoute exact path='/health' component={HealthView}/>
     <PrivateRoute exact path='/local' component={LocalView}/>
-    <PrivateRoute exact path='/petService' component={PetServiceView}/>
+    <PrivateRoute exact path='/petService' component={PetSettingsView}/>
     <Route exact path='/auth' component={AuthenticateView} />
   </Switch>
 );
