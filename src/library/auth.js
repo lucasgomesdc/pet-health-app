@@ -1,6 +1,6 @@
 export const isAuthenticated = () => {
     let user = localStorage.getItem('token');
-    if(user && (user.jwt != false || user.jwt != "")) {
+    if(user && user != "null") {
         return true;
     } else {
         return false;

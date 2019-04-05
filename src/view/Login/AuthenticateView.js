@@ -28,7 +28,7 @@ const styleSheet = {
     margin: "0px auto 50px"
   },
   registerPaper: {
-    height: "400px",
+    height: "415px",
     width: "calc(100% - 50px)",
     margin: "0px auto 50px"
   },
@@ -62,6 +62,9 @@ class AuthenticateView extends Component {
       emailRegister: "",
       passwordRegister: "",
       repeatPasswordRegister: "",
+      errorLogin: false,
+      errorRegister: false,
+      registerErrorMessage: ""
     }
   }
 
@@ -82,6 +85,11 @@ class AuthenticateView extends Component {
   };
 
   requestSign(){
+    if(this.state.emailLogin == "" || this.state.passwordLogin == "") {
+      this.state.errorLogin = true;
+      this.setState(this.state);
+      return;
+    }
     let prepareObj = {
       email: this.state.emailLogin,
       password: this.state.passwordLogin
@@ -100,11 +108,52 @@ class AuthenticateView extends Component {
       console.log(result);
     }).catch((err)=>{
       console.log("Erro: ", err);
-    })
+      this.state.errorLogin = true;
+      this.setState(this.state);
+    });
   }
 
   requestRegister(){
-    console.log("aqui registra");
+    if(this.state.nameRegister == ""){
+      this.state.errorRegister = true;
+      this.state.registerErrorMessage = "Erro ao registrar - Nome obrigatório!"
+      this.setState(this.state);
+      return;
+    }
+
+    if(this.state.emailRegister == ""){
+      this.state.errorRegister = true;
+      this.state.registerErrorMessage = "Erro ao registrar - E-mail obrigatório!"
+      this.setState(this.state);
+      return;
+    }
+    if(this.state.passwordRegister == this.state.repeatPasswordRegister){
+      let prepareObj = {
+        name: this.state.nameRegister,
+        email: this.state.emailRegister,
+        password: this.state.passwordRegister
+      }
+
+      AuthenticateApiService.requestRegister(prepareObj).then((result) => {
+        let user = {
+          id: result.user._id,
+          nome: result.user.name,
+        }
+        let jwt = result.token;
+  
+        localStorage.setItem('token', jwt);
+        localStorage.setItem('user', JSON.stringify(user));
+        this.props.history.push('/');
+      }).catch((err)=>{
+        console.log("Erro: ", err);
+        this.state.errorRegister = true;
+        this.setState(this.state);
+      });
+    } else {
+      this.state.errorRegister = true;
+      this.state.registerErrorMessage = "Erro ao registrar - Senhas diferentes!"
+      this.setState(this.state);
+    }
   }
 
   render(){
@@ -126,11 +175,15 @@ class AuthenticateView extends Component {
             <Lock className={classes.iconDesign}/>
             <TextField label="Senha" className={classes.textFieldDesign} type={'password'} onChange={this.handleChangeInput('passwordLogin')}/>
           </div>
-          <div>
-            <Typography variant="body2" gutterBottom style={{textAlign: "center", fontWeight: "600"}}>
-              Erro ao entrar - Usuário ou senha invalida!
-            </Typography>
-          </div>
+          {this.state.errorLogin ? 
+            <div>
+              <Typography variant="body2" gutterBottom style={{textAlign: "center", color: "red"}}>
+                Erro ao entrar - Usuário ou senha invalida!
+              </Typography>
+            </div>
+          :
+            null
+          }
           <div style={{textAlign: "center", margin: "8px 0px"}}>
             <Button onClick={()=>this.requestSign()} variant="contained" color="primary" style={{width: "calc(100% - 50px)"}}>
               Entrar
@@ -162,12 +215,22 @@ class AuthenticateView extends Component {
           <div className={classes.inputDesign}>
             <TextField label="Repita a senha" className={classes.textFieldRegister} type={'password'} onChange={this.handleChangeInput('repeatPasswordRegister')}/>
           </div>
-          <div style={{textAlign: "center", margin: "24px 0px 12px 0px"}} >
-            <Button onClick={()=>this.requestRegister()} variant="contained" color="primary">
+          {this.state.errorRegister ? 
+            <div>
+              <Typography variant="body2" gutterBottom style={{textAlign: "center", color: "red"}}>
+                {this.state.registerErrorMessage}
+              </Typography>
+            </div>
+          :
+            null
+          }
+          <div style={{textAlign: "center", margin: "6px 0px 12px 0px"}} >
+            <Button onClick={()=>this.requestRegister()} variant="contained" color="primary" style={{width: "calc(100% - 50px)"}}>
               Registrar
             </Button>
           </div>
-          <div style={{textAlign: "center", margin: "12px 0px 12px 0px"}}>  
+          <div style={{textAlign: "center", margin: "6px 0px 6px 0px"}}>  
+            Já tem uma conta? 
             <Button onClick={()=>{this.handleChangeView("sign")}} color="primary" style={{fontWeight: "600"}}>
               Entrar
             </Button>
