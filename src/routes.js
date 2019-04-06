@@ -13,7 +13,7 @@ const PrivateRoute = ({ component: Component, ...rest}) => (
   <Route
     {...rest}
     render={props=> 
-      isAuthenticated() ? (
+      !isAuthenticated() ? (
         <Component {...props} />
       ) : (
         <Redirect to={{ pathname: '/petRegister', state: { from: props.location } }} />

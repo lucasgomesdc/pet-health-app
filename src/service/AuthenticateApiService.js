@@ -2,7 +2,6 @@ import fetchWithTimeout from '../library/fetchWithTimeout';
 
 class AuthenticateApiService { 
 	requestLogin(user){
-		let test1 = JSON.stringify(user);
 		return new Promise((resolve, reject) =>{
 			fetch(global.API_ENDPOINT + '/auth/login', {
 				method: "POST", 

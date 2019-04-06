@@ -27,19 +27,7 @@ import { faDog } from '@fortawesome/pro-solid-svg-icons';
 import { faCheck } from '@fortawesome/pro-solid-svg-icons';
 
 import CameraService from '../../service/CameraService';
-
-/*
-  
-  tipo
-  raça
-  nome
-  chip
-  aniversario
-  peso
-  genero
-  castrado
-
-*/
+import UploadImageService from '../../service/UploadImageService';
 
 const animalType = [
   {
@@ -108,9 +96,10 @@ class PetRegister extends Component {
       breed: "",
       born: "",
       weight: "",
-      castrated: "",
+      castrated: "nao",
       media: null,
       imageRaw: "",
+      pedigree: "nao",
       anchorEl: null,
     }
   }
@@ -128,6 +117,10 @@ class PetRegister extends Component {
 
   handleChangeCastrated = event => {
     this.setState({ castrated: event.target.value });
+  };
+
+  handleChangePedigree = event => {
+    this.setState({ pedigree: event.target.value });
   };
 
   handleChangeDate = date => {
@@ -149,8 +142,9 @@ class PetRegister extends Component {
 
   startCamera() {
     CameraService.initCamera((imageRaw)=>{
-      this.state.imageRaw = imageRaw;
+      this.state.imageRaw = "data:image/png;base64,"+imageRaw;
       this.setState(this.state);
+      this.handleSendAWS(imageRaw);
     }, (err)=>{
       console.log("Error: ", err);
     });
@@ -158,10 +152,25 @@ class PetRegister extends Component {
 
   startGallery() { 
     CameraService.initGallery((imageRaw)=>{
-      this.state.imageRaw = imageRaw;
+      this.state.imageRaw = "data:image/png;base64,"+imageRaw;
       this.setState(this.state);
+      this.handleSendAWS(imageRaw);
     }, (err)=>{
       console.log("Error: ", err);
+    });
+  }
+
+  handleSendAWS(imageRaw){
+    const jwt = localStorage.getItem("token");
+    let imageObj = {
+      mediaRaw: imageRaw,
+      user_id: JSON.parse(localStorage.getItem("user")).id
+    }
+    UploadImageService.sendImageToAWS(Object.assign({}, imageObj), jwt).then((result)=>{
+      this.state.media = result.Location;
+      this.setState(this.state);
+    }).catch((err)=>{
+      console.log(err);
     });
   }
 
@@ -347,6 +356,19 @@ class PetRegister extends Component {
             </RadioGroup>
           </div>
           <div className={classes.selectionSection}>
+            <FormLabel component="legend" required>Pedigree</FormLabel>
+            <RadioGroup
+              aria-label="Pedigree"
+              name="pedigree"
+              className={classes.group}
+              value={this.state.pedigree}
+              onChange={this.handleChangePedigree}
+            >
+              <FormControlLabel value="nao" control={<Radio color="primary"/>} label="Não" />
+              <FormControlLabel value="sim" control={<Radio color="primary"/>} label="Sim" />
+            </RadioGroup>
+          </div>
+          <div className={classes.selectionSection}>
             <FormLabel component="legend" required>Castrado</FormLabel>
             <RadioGroup
               aria-label="Castrado"
@@ -355,8 +377,8 @@ class PetRegister extends Component {
               value={this.state.castrated}
               onChange={this.handleChangeCastrated}
             >
-              <FormControlLabel value="sim" control={<Radio color="primary"/>} label="Sim" />
               <FormControlLabel value="nao" control={<Radio color="primary"/>} label="Não" />
+              <FormControlLabel value="sim" control={<Radio color="primary"/>} label="Sim" />
             </RadioGroup>
           </div>
           <div style={{textAlign: "center", margin:"12px 0px"}}>
