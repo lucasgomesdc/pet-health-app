@@ -1,7 +1,7 @@
 class UploadImageService { 
   sendImageToAWS(imageObj, jwt){
     return new Promise((resolve, reject)=>{
-      fetch(global.API_ENDPOINT + '/petRegister',{
+      fetch(global.API_ENDPOINT + '/imageProfileUpload',{
         method: "POST",
         headers: {
           "Content-Type": "application/json",
