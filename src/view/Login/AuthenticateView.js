@@ -8,7 +8,9 @@ import TextField from '@material-ui/core/TextField';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Lock from '@material-ui/icons/Lock';
 import Button from '@material-ui/core/Button';
+
 import AuthenticateApiService from '../../service/AuthenticateApiService';
+import ApiService from '../../service/ApiService';
 
 const styleSheet = {
   backgroundLogo: {
@@ -104,7 +106,17 @@ class AuthenticateView extends Component {
 
       localStorage.setItem('token', jwt);
       localStorage.setItem('user', JSON.stringify(user));
-      this.props.history.push('/');
+      
+      
+      //Antes de ir pra home, verifica se o pet já está criado com request
+      ApiService.requestPet(user.id, jwt).then((pet)=>{
+        let petData = pet;
+        console.log(petData);
+        this.props.history.push('/');
+      }).catch((err)=>{
+        console.log("se cair aqui eu ainda nao sei o porque");
+      });
+
     }).catch((err)=>{
       console.log("Erro: ", err);
       this.state.errorLogin = true;
