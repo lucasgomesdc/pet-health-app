@@ -105,7 +105,6 @@ class AuthenticateView extends Component {
       localStorage.setItem('token', jwt);
       localStorage.setItem('user', JSON.stringify(user));
       this.props.history.push('/');
-      console.log(result);
     }).catch((err)=>{
       console.log("Erro: ", err);
       this.state.errorLogin = true;

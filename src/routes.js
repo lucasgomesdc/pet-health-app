@@ -13,10 +13,10 @@ const PrivateRoute = ({ component: Component, ...rest}) => (
   <Route
     {...rest}
     render={props=> 
-      !isAuthenticated() ? (
+      isAuthenticated() ? (
         <Component {...props} />
       ) : (
-        <Redirect to={{ pathname: '/petRegister', state: { from: props.location } }} />
+        <Redirect to={{ pathname: '/auth', state: { from: props.location } }} />
       )
     }
   />
@@ -28,7 +28,7 @@ const Routes = () => (
     <PrivateRoute exact path='/health' component={HealthView}/>
     <PrivateRoute exact path='/local' component={LocalView}/>
     <PrivateRoute exact path='/petService' component={PetSettingsView}/>
-    <Route exact path='/petRegister' component={PetRegister} />
+    <PrivateRoute exact path='/petRegister' component={PetRegister} />
     <Route exact path='/auth' component={AuthenticateView} />
   </Switch>
 );
