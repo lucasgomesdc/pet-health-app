@@ -9,8 +9,17 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import Lock from '@material-ui/icons/Lock';
 import Button from '@material-ui/core/Button';
 
+
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
+
 import AuthenticateApiService from '../../service/AuthenticateApiService';
 import ApiService from '../../service/ApiService';
+
 
 const styleSheet = {
   backgroundLogo: {
@@ -51,6 +60,10 @@ const styleSheet = {
   }
 }
 
+function Transition(props) {
+  return <Slide direction="up" {...props} />;
+}
+
 class AuthenticateView extends Component {
   constructor(props, context){
     super(props, context);
@@ -66,7 +79,8 @@ class AuthenticateView extends Component {
       repeatPasswordRegister: "",
       errorLogin: false,
       errorRegister: false,
-      registerErrorMessage: ""
+      registerErrorMessage: "",
+      openModal: false
     }
   }
 
@@ -85,6 +99,16 @@ class AuthenticateView extends Component {
   handleChangeInput = prop => event => {
     this.setState({ [prop]: event.target.value });
   };
+
+  handleModalClose = () => {
+    this.setState({ openModal: false });
+  };
+
+  handleClickRegister() {
+    this.state.openModal = false;
+    this.setState(this.state);
+    this.props.history.push('/petRegister');
+  }
 
   requestSign(){
     if(this.state.emailLogin == "" || this.state.passwordLogin == "") {
@@ -107,16 +131,17 @@ class AuthenticateView extends Component {
       localStorage.setItem('token', jwt);
       localStorage.setItem('user', JSON.stringify(user));
       
-      
       //Antes de ir pra home, verifica se o pet já está criado com request
       ApiService.requestPet(user.id, jwt).then((pet)=>{
-        let petData = pet;
-        console.log(petData);
-        this.props.history.push('/');
+        if(pet){ 
+          this.props.history.push('/');
+        }else{
+          this.state.openModal = true;
+          this.setState(this.state);
+        }
       }).catch((err)=>{
-        console.log("se cair aqui eu ainda nao sei o porque");
+        console.log("Erro: ", err);
       });
-
     }).catch((err)=>{
       console.log("Erro: ", err);
       this.state.errorLogin = true;
@@ -154,7 +179,7 @@ class AuthenticateView extends Component {
   
         localStorage.setItem('token', jwt);
         localStorage.setItem('user', JSON.stringify(user));
-        this.props.history.push('/');
+        this.props.history.push('/petRegister');
       }).catch((err)=>{
         console.log("Erro: ", err);
         this.state.errorRegister = true;
@@ -248,6 +273,29 @@ class AuthenticateView extends Component {
           </div>
         </Paper>
         }
+        <Dialog
+          open={this.state.openModal}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={this.handleModalClose}
+          aria-labelledby="modal-title"
+          aria-describedby="modal-description"
+        >
+          <DialogTitle id="modal-title">
+            {"Nenhum animal registrado!"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="modal-description">
+              Não encontrei nenhum registro de um animal de estimação na sua conta.
+              Adicione um animal para utilizar o Pet Health App
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={()=>this.handleClickRegister()} color="primary">
+              Adicionar
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }

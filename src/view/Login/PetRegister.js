@@ -28,26 +28,16 @@ import { faCheck } from '@fortawesome/pro-solid-svg-icons';
 
 import CameraService from '../../service/CameraService';
 import UploadImageService from '../../service/UploadImageService';
+import ApiService from '../../service/ApiService';
 
 const animalType = [
   {
-    value: 'dog',
+    value: 'cachorro',
     label: 'Cachorro',
   },
   {
-    value: 'cat',
+    value: 'gato',
     label: 'Gato',
-  }
-];
-
-const animalBreed = [
-  {
-    value: 'golden',
-    label: 'Golden Retriever',
-  },
-  {
-    value: 'labrador',
-    label: 'Labrador',
   }
 ];
 
@@ -89,7 +79,7 @@ class PetRegister extends Component {
     super(props, context);
     this.props = props;
     this.state = {
-      type: "dog",
+      type: "cachorro",
       name: "",
       microchip: "",
       gender: "macho",
@@ -101,14 +91,42 @@ class PetRegister extends Component {
       imageRaw: "",
       pedigree: "nao",
       anchorEl: null,
+      animalBreedList: [],
+      foundError: false
     }
+    this.breedList = null
   }
 
   componentDidMount() {
+    ApiService.requestBreedList(localStorage.getItem('token')).then((result)=>{
+      this.breedList = result;
+      this.filterBreed();
+    }).catch((err)=>{
+      console.log("Erro", err);
+    })
+  }
+
+  filterBreed() { 
+    this.state.breed = "";
+    this.state.animalBreedList = [];
+    this.breedList.forEach((breed)=>{
+      if(breed.species == this.state.type){
+        this.state.animalBreedList.push({value: breed._id, label: breed.name});
+      }
+    });
+    this.setState(this.state);
   }
 
   handleChange = name => event => {
-    this.setState({ [name]: event.target.value });
+    this.setState( {[name]: event.target.value} );
+  };
+
+  handleChangeSelect(name, event) {
+    this.state[name] = event.target.value;
+    this.setState(this.state);
+    if(name == "type"){
+      this.filterBreed();
+    }
   };
 
   handleChangeGender = event => {
@@ -174,6 +192,41 @@ class PetRegister extends Component {
     });
   }
 
+  saveRegisterPet() {
+    this.validateData();
+
+    if(this.state.foundError == false){
+      let petObj = {
+        name: this.state.name,
+        type: this.state.type,
+        media: this.state.media,
+        breed: this.state.breed,
+        microchip: this.state.microchip,
+        born: this.state.born,
+        weight: this.state.weight,
+        gender: this.state.gender,
+        pedigree: this.state.pedigree == "sim" ? true : false,
+        castrated: this.state.castrated == "sim" ? true : false,
+      }
+
+      const jwt = localStorage.getItem("token");
+      ApiService.requestSavePet(petObj, jwt).then((data)=>{
+        this.props.history.push('/');
+      }).catch((err)=>{
+        console.log("Erro", err);
+      });
+    }
+  }
+
+  validateData(){
+    if(this.state.name === "" || this.state.breed === "" || this.state.born === "") {
+      this.state.foundError = true;
+    } else {
+      this.state.foundError = false;
+    }
+    this.setState(this.state);
+  }
+
   deleteImage() { 
     this.state.imageRaw = "";
     this.setState(this.state);
@@ -198,7 +251,7 @@ class PetRegister extends Component {
                 src=""
                 className={classes.avatarWithoutImage}
               >
-                {this.state.type === "dog" ? 
+                {this.state.type === "cachorro" ? 
                   <FontAwesomeIcon icon={faDog} style={{fontSize: "60px"}}/>
                 :
                   <FontAwesomeIcon icon={faCat} style={{fontSize: "60px"}}/>
@@ -230,7 +283,7 @@ class PetRegister extends Component {
             }
           </div>
           <div>
-            {this.state.type === "dog" ? 
+            {this.state.type === "cachorro" ? 
               <FontAwesomeIcon icon={faDog} style={{color: "rgba(0, 0, 0, 0.54)", margin: "30px 16px 4px 0px", fontSize: "22px"}}/>
             :
               <FontAwesomeIcon icon={faCat} style={{color: "rgba(0, 0, 0, 0.54)", margin: "30px 16px 4px 0px", fontSize: "22px"}}/>
@@ -240,7 +293,7 @@ class PetRegister extends Component {
               label="Tipo do Animal"
               className={classes.textField}
               value={this.state.type}
-              onChange={this.handleChange('type')}
+              onChange={(evt)=>this.handleChangeSelect('type', evt)}
               SelectProps={{
                 MenuProps: {
                   className: classes.menu,
@@ -261,11 +314,12 @@ class PetRegister extends Component {
           <div>
             <FontAwesomeIcon icon={faStars} style={{color: "rgba(0, 0, 0, 0.54)", margin: "30px 16px 4px 0px", fontSize: "22px"}}/>
             <TextField
+              error={this.state.breed === "" && this.state.foundError}
               select
               label="Raça do Animal"
               className={classes.textField}
               value={this.state.breed}
-              onChange={this.handleChange('breed')}
+              onChange={(evt)=>this.handleChangeSelect('breed', evt)}
               SelectProps={{
                 MenuProps: {
                   className: classes.menu,
@@ -276,7 +330,7 @@ class PetRegister extends Component {
               margin="normal"
               fullWidth
             >
-              {animalBreed.map(option => (
+              {this.state.animalBreedList.map(option => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
@@ -284,12 +338,13 @@ class PetRegister extends Component {
             </TextField>
           </div>
           <div>
-            {this.state.type === "dog" ? 
+            {this.state.type === "cachorro" ? 
               <FontAwesomeIcon icon={faPaw} style={{color: "rgba(0, 0, 0, 0.54)", margin: "30px 16px 4px 0px", fontSize: "22px"}}/>
             :
               <FontAwesomeIcon icon={faPawAlt} style={{color: "rgba(0, 0, 0, 0.54)", margin: "30px 16px 4px 0px", fontSize: "22px"}}/>
             }
             <TextField
+              error={this.state.name === "" && this.state.foundError}
               label="Nome"
               className={classes.textField}
               value={this.state.name}
@@ -313,6 +368,7 @@ class PetRegister extends Component {
           <div>
             <FontAwesomeIcon icon={faBirthdayCake} style={{color: "rgba(0, 0, 0, 0.54)", margin: "30px 16px 4px 0px", fontSize: "22px"}}/>
             <TextField
+              error={this.state.born === "" && this.state.foundError}
               label="Aniversário"
               type="date"
               className={classes.textField}
@@ -387,7 +443,7 @@ class PetRegister extends Component {
               size="medium"
               color="primary"
               aria-label="Concluir"
-              onClick={()=>{console.log(this.state)}}
+              onClick={()=>{this.saveRegisterPet()}}
             >
               <FontAwesomeIcon icon={faCheck} style={{marginRight: "12px"}}/>
               Concluir

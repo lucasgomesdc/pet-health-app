@@ -5,7 +5,7 @@ import Dialog from '@material-ui/core/Dialog';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import ArrowBack from '@material-ui/icons/NavigateBefore';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import Slide from '@material-ui/core/Slide';
 import Assignment from '@material-ui/icons/Assignment';
 import TextField from '@material-ui/core/TextField';
@@ -57,7 +57,7 @@ class VacinesDialog extends Component {
           <AppBar className={classes.appBar} style={{backgroundColor: "#90caf9"}}>
             <Toolbar>
               <IconButton color="inherit" onClick={()=>{this.props.close()}} aria-label="Close">
-                <ArrowBack style={{fontSize: "2.5rem"}}/>
+                <ExpandMore style={{fontSize: "2.5rem"}}/>
               </IconButton>
               <Typography variant="h6" color="inherit" className={classes.flex}>
                 Vacinas

@@ -5,7 +5,7 @@ import Dialog from '@material-ui/core/Dialog';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import ArrowBack from '@material-ui/icons/NavigateBefore';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import Alarm from '@material-ui/icons/Alarm';
 import Slide from '@material-ui/core/Slide';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -109,7 +109,7 @@ class LunchDialog extends Component {
           <AppBar className={classes.appBar} style={{backgroundColor: "#ff7043"}}>
             <Toolbar>
               <IconButton color="inherit" onClick={()=>{this.props.close()}} aria-label="Close">
-                <ArrowBack style={{fontSize: "2.5rem"}}/>
+                <ExpandMore style={{fontSize: "2.5rem"}}/>
               </IconButton>
               <Typography variant="h6" color="inherit" className={classes.flex}>
                 Alimentação
