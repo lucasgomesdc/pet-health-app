@@ -70,7 +70,6 @@ class LunchDialog extends Component {
   }
 
   componentDidMount() {
-    customEvent('showBar', true);
   }
 
   handleChange = name => event => {

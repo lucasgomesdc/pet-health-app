@@ -8,7 +8,12 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Slide from '@material-ui/core/Slide';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faMapMarkerAlt } from '@fortawesome/pro-solid-svg-icons';
+import { faInstagram } from '@fortawesome/free-brands-svg-icons';
 import { customEvent } from '../../library';
+import ApiService from '../../service/ApiService';
+import GPSService from '../../service/GPSService';
 
 const styleSheet = {
 }
@@ -22,14 +27,27 @@ class MeetingsDialog extends Component {
     super(props, context);
     this.props = props;
     this.state = {
+      coordinates: [],
+      meetingList: []
     }
   }
   componentDidMount() {
-    customEvent('showBar', true);
+    GPSService.initGPS((position)=>{
+      this.state.coordinates = [position.coords.latitude, position.coords.longitude];
+      ApiService.requestMeetings(this.state.coordinates, localStorage.getItem('token')).then((result)=>{
+        if(result){
+          this.state.meetingList = result;
+        }
+        this.setState(this.state);
+      }).catch((err)=>{
+        console.log(err);
+      });
+    });
   }
 
   render(){
     const { classes } = this.props;
+    let image = "https://s3-sa-east-1.amazonaws.com/pet-health-storage/image-profile/5c9d6d250ab50145bca492ff.png";
 
     return(
       <div>
@@ -49,6 +67,40 @@ class MeetingsDialog extends Component {
               </Typography>
             </Toolbar>
           </AppBar>
+          <div style={{width: "100%", marginTop: "64px"}}>
+            <div style={{height: "95px", display: "inline-flex", width: "100%"}}>
+              <div style={{
+                backgroundImage: `url('${image}')`, 
+                width: "25%", 
+                height: "100px",
+                backgroundPosition: "center center",
+                backgroundRepeat: "no-repeat"
+              }}>
+              </div>
+              <div style={{width: "60%", padding: "12px"}}>
+                <div style={{fontSize: "30px"}}>
+                  Ayla
+                </div>
+                <div style={{marginTop: "12px"}}>
+                  <FontAwesomeIcon icon={faMapMarkerAlt} style={{color: "rgba(0, 0, 0, 0.54)", marginRight: '8px'}}/>
+                  26km
+                </div>
+              </div>
+              <div style={{width: "15%", position: "relative"}}>
+                <IconButton className={classes.button} aria-label="contact" style={{
+                  position:"absolute",
+                  left:0,
+                  right:0,
+                  top:0,
+                  bottom:0,
+                  margin:"auto",
+                  fontSize: "30px"
+                }}>
+                  <FontAwesomeIcon icon={faInstagram} style={{color: "rgba(0, 0, 0, 0.54)"}}/>
+                </IconButton>
+              </div>
+            </div>
+          </div>
         </Dialog>
       </div>
     );

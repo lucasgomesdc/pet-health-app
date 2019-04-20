@@ -23,6 +23,11 @@ class PetSettingsView extends Component {
 
   componentDidMount() {
     customEvent('showBar', true);
+    let coordinates = JSON.parse(localStorage.getItem('GPS'));
+    if(coordinates){
+      this.state.checkedGPS = true;
+    }
+    this.setState(this.state);
   }
 
   handleChangeGPS(event) {
