@@ -23,7 +23,8 @@ class HealthView extends Component {
     super(props, context);
     this.props = props;
     this.state = {
-      categoryOpen: false
+      categoryOpen: false,
+      user: JSON.parse(localStorage.getItem('user'))
     }
   }
 
@@ -64,18 +65,26 @@ class HealthView extends Component {
             <Paper onClick={()=>{this.handleClickOpen("medicines")}} className={classes.paper} style={{padding: "40px 0px 40px 0px", backgroundColor: "#80deea"}}>
               <div style={{textAlign: "center", fontSize: "3rem", color: "white"}}><FontAwesomeIcon icon={faCapsules} /></div>
             </Paper>
-          </Grid>       
-          <Grid item xs={6}>
-            <Paper onClick={()=>{this.handleClickOpen("meetings")}} className={classes.paper} style={{padding: "40px 0px 40px 0px", backgroundColor: "#b39ddb"}}>
-              <div style={{textAlign: "center", fontSize: "3rem", color: "white"}}><FontAwesomeIcon icon={faHandHoldingHeart} /></div>
-            </Paper>
           </Grid>
+          {this.state.user.meetings ? 
+            <Grid item xs={6}>
+              <Paper onClick={()=>{this.handleClickOpen("meetings")}} className={classes.paper} style={{padding: "40px 0px 40px 0px", backgroundColor: "#b39ddb"}}>
+                <div style={{textAlign: "center", fontSize: "3rem", color: "white"}}><FontAwesomeIcon icon={faHandHoldingHeart} /></div>
+              </Paper>
+            </Grid>
+          :
+            null
+          }       
         </Grid>
 
         <LunchDialog open={this.state.categoryOpen === "lunch" ? true : false} close={()=> this.handleClose()}/>
         <MedicinesDialog open={this.state.categoryOpen === "medicines" ? true : false} close={()=> this.handleClose()}/>
         <VacinesDialog open={this.state.categoryOpen === "vacines" ? true : false} close={()=> this.handleClose()}/>
-        <MeetingsDialog open={this.state.categoryOpen === "meetings" ? true : false} close={()=> this.handleClose()}/>
+        {this.state.user.meetings ? 
+          <MeetingsDialog open={this.state.categoryOpen === "meetings" ? true : false} close={()=> this.handleClose()}/>
+        :
+          null
+        }
       </div>
     );
   }

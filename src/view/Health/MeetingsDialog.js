@@ -7,6 +7,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Slide from '@material-ui/core/Slide';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMapMarkerAlt } from '@fortawesome/pro-solid-svg-icons';
@@ -27,14 +28,20 @@ class MeetingsDialog extends Component {
     super(props, context);
     this.props = props;
     this.state = {
-      coordinates: [],
+      gps: [],
       meetingList: []
     }
   }
+
   componentDidMount() {
     GPSService.initGPS((position)=>{
-      this.state.coordinates = [position.coords.latitude, position.coords.longitude];
-      ApiService.requestMeetings(this.state.coordinates, localStorage.getItem('token')).then((result)=>{
+      this.state.gps = { 
+        latitude: position.coords.latitude, 
+        longitude: position.coords.longitude
+      };
+      let obj = [this.state.gps.latitude, this.state.gps.longitude];
+      localStorage.setItem('GPS', JSON.stringify(this.state.gps));
+      ApiService.requestListMeetings(obj, localStorage.getItem('token')).then((result)=>{
         if(result){
           this.state.meetingList = result;
         }
@@ -47,8 +54,44 @@ class MeetingsDialog extends Component {
 
   render(){
     const { classes } = this.props;
-    let image = "https://s3-sa-east-1.amazonaws.com/pet-health-storage/image-profile/5c9d6d250ab50145bca492ff.png";
 
+    let listItem = this.state.meetingList.map((meeting, index)=>{
+      let distanceInKm = parseInt(meeting.distance/1000);
+      return(
+        <div key={index} style={{height: "95px", display: "inline-flex", width: "100%"}}>
+          <div style={{
+            backgroundImage: `url('${meeting.pet.media}')`, 
+            width: "25%", 
+            height: "100px",
+            backgroundPosition: "center center",
+            backgroundRepeat: "no-repeat"
+          }}>
+          </div>
+          <div style={{width: "60%", padding: "12px"}}>
+            <div style={{fontSize: "30px"}}>
+              {meeting.pet.name}
+            </div>
+            <div style={{marginTop: "12px"}}>
+              <FontAwesomeIcon icon={ faMapMarkerAlt } style={{color: "rgba(0, 0, 0, 0.54)", marginRight: '8px'}}/>
+              {distanceInKm+' '}km
+            </div>
+          </div>
+          <div style={{width: "15%", position: "relative"}}>
+            <IconButton 
+              className={classes.button}
+              aria-label="contact"
+              style={{
+                position:"absolute",
+                top: "calc(50% - 30px)",
+                fontSize: "30px"
+              }}
+            >
+              <FontAwesomeIcon icon={ faInstagram } style={{color: "rgba(0, 0, 0, 0.54)"}}/>
+            </IconButton>
+          </div>
+        </div>
+      );
+    });
     return(
       <div>
         <Dialog
@@ -67,39 +110,14 @@ class MeetingsDialog extends Component {
               </Typography>
             </Toolbar>
           </AppBar>
-          <div style={{width: "100%", marginTop: "64px"}}>
-            <div style={{height: "95px", display: "inline-flex", width: "100%"}}>
-              <div style={{
-                backgroundImage: `url('${image}')`, 
-                width: "25%", 
-                height: "100px",
-                backgroundPosition: "center center",
-                backgroundRepeat: "no-repeat"
-              }}>
+          <div style={{width: "100%", marginTop: "64px"}}> 
+            {listItem && listItem.length > 0 ? 
+              listItem 
+              : 
+              <div style={{width: "100%", textAlign: "center", marginTop: "22px"}}>
+                <CircularProgress className={classes.progress} />
               </div>
-              <div style={{width: "60%", padding: "12px"}}>
-                <div style={{fontSize: "30px"}}>
-                  Ayla
-                </div>
-                <div style={{marginTop: "12px"}}>
-                  <FontAwesomeIcon icon={faMapMarkerAlt} style={{color: "rgba(0, 0, 0, 0.54)", marginRight: '8px'}}/>
-                  26km
-                </div>
-              </div>
-              <div style={{width: "15%", position: "relative"}}>
-                <IconButton className={classes.button} aria-label="contact" style={{
-                  position:"absolute",
-                  left:0,
-                  right:0,
-                  top:0,
-                  bottom:0,
-                  margin:"auto",
-                  fontSize: "30px"
-                }}>
-                  <FontAwesomeIcon icon={faInstagram} style={{color: "rgba(0, 0, 0, 0.54)"}}/>
-                </IconButton>
-              </div>
-            </div>
+            }
           </div>
         </Dialog>
       </div>

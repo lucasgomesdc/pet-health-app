@@ -199,6 +199,11 @@ class MyPetView extends Component {
             Emergência
           </Fab>
         </div>
+        <div style={{height: "250px", width: "100%", position: "relative"}}>
+            <div style={{  position: "absolute" , top: "125px", right: 0, left: 0, margin: "auto", textAlign: "center"}}>
+              Não há registro de tarefas adicionado!
+            </div>
+        </div>
       </div>
     );
   }

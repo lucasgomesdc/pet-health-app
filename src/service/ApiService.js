@@ -54,10 +54,103 @@ class AuthenticateApiService {
 		});
   }
 
-  requestMeetings(obj, jwt) {
+  requestRegisterMeetings(obj, jwt) { 
+    return new Promise((resolve, reject) =>{
+			fetch(global.API_ENDPOINT + '/meetings/new', {
+				method: "POST", 
+				headers: {
+					"Content-Type": "application/json",
+          "Authorization": "Bearer "+ jwt
+				},
+				body: JSON.stringify(obj)
+      }).then((result)=>{
+				result.json().then((result)=>{
+					resolve(result);
+				});
+      }).catch((err)=>{
+        reject(err);
+      });
+    });
+  }
+
+  requestMeeting(userId, jwt) {
+    return new Promise((resolve, reject) =>{
+			fetch(global.API_ENDPOINT + '/meetings/'+ userId, {
+				method: "GET", 
+				headers: {
+					"Content-Type": "application/json",
+          "Authorization": "Bearer "+ jwt
+				}
+      }).then((result)=>{
+				result.json().then((result)=>{
+					resolve(result);
+				});
+      }).catch((err)=>{
+        reject(err);
+      });
+    });
+  }
+
+  requestListMeetings(obj, jwt) {
     return new Promise((resolve, reject) =>{
 			fetch(global.API_ENDPOINT + '/meetings', {
 				method: "POST", 
+				headers: {
+					"Content-Type": "application/json",
+          "Authorization": "Bearer "+ jwt
+				},
+				body: JSON.stringify(obj)
+      }).then((result)=>{
+				result.json().then((result)=>{
+					resolve(result);
+				});
+      }).catch((err)=>{
+        reject(err);
+      });
+    });
+  }
+
+  requestUpdateMeetings(userId, obj, jwt) { 
+    return new Promise((resolve, reject) =>{
+			fetch(global.API_ENDPOINT + '/meetings/' + userId, {
+				method: "PUT", 
+				headers: {
+					"Content-Type": "application/json",
+          "Authorization": "Bearer "+ jwt
+				},
+				body: JSON.stringify(obj)
+      }).then((result)=>{
+				result.json().then((result)=>{
+					resolve(result);
+				});
+      }).catch((err)=>{
+        reject(err);
+      });
+    });
+  }
+
+  requestDeleteMeetings(userId, jwt) { 
+    return new Promise((resolve, reject) =>{
+			fetch(global.API_ENDPOINT + '/meetings/' + userId, {
+				method: "DELETE", 
+				headers: {
+					"Content-Type": "application/json",
+          "Authorization": "Bearer "+ jwt
+				}
+      }).then((result)=>{
+				result.json().then((result)=>{
+					resolve(result);
+				});
+      }).catch((err)=>{
+        reject(err);
+      });
+    });
+  }
+
+  requestUpdateUser(id, obj, jwt) {
+    return new Promise((resolve, reject) =>{
+			fetch(global.API_ENDPOINT + '/register/' + id, {
+				method: "PUT", 
 				headers: {
 					"Content-Type": "application/json",
           "Authorization": "Bearer "+ jwt

@@ -125,6 +125,8 @@ class AuthenticateView extends Component {
       let user = {
         id: result.user._id,
         nome: result.user.name,
+        email: result.user.email,
+        meetings: result.user.meetings,
       }
       let jwt = result.token;
 
