@@ -166,5 +166,60 @@ class AuthenticateApiService {
     });
   }
 
+  requestSaveHealth(url, obj, jwt) {
+    return new Promise((resolve, reject) =>{
+			fetch(global.API_ENDPOINT + '/health/' + url, {
+				method: "POST", 
+				headers: {
+					"Content-Type": "application/json",
+          "Authorization": "Bearer "+ jwt
+				},
+				body: JSON.stringify(obj)
+      }).then((result)=>{
+				result.json().then((result)=>{
+					resolve(result);
+				});
+      }).catch((err)=>{
+        reject(err);
+      });
+    });
+  }
+
+  requestDeleteHealth(url, jwt) {
+    return new Promise((resolve, reject) =>{
+			fetch(global.API_ENDPOINT + '/health/' + url, {
+				method: "DELETE", 
+				headers: {
+					"Content-Type": "application/json",
+          "Authorization": "Bearer "+ jwt
+				}
+      }).then((result)=>{
+				result.json().then((result)=>{
+					resolve(result);
+				});
+      }).catch((err)=>{
+        reject(err);
+      });
+    });
+  }
+
+  requestListHealth(url, jwt) {
+    return new Promise((resolve, reject) =>{
+			fetch(global.API_ENDPOINT + '/health/' + url, {
+				method: "GET", 
+				headers: {
+					"Content-Type": "application/json",
+          "Authorization": "Bearer "+ jwt
+				}
+      }).then((result)=>{
+				result.json().then((result)=>{
+					resolve(result);
+				});
+      }).catch((err)=>{
+        reject(err);
+      });
+    });
+  }
+
 }
 export default new AuthenticateApiService();

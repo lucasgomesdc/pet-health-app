@@ -112,7 +112,7 @@ class PetSettingsView extends Component {
             }
           }
           ApiService.requestRegisterMeetings(meetingObj, jwt).then((result) => {
-            localStorage.setItem('meeting', JSON.stringify(result));
+            localStorage.setItem('meeting', JSON.stringify(result.meeting));
           }).catch((err)=>{
             console.log(err);
           });
@@ -121,7 +121,7 @@ class PetSettingsView extends Component {
     } else {
       ApiService.requestMeeting(this.state.user.id, jwt).then((result)=>{
         if(result.code == "302"){
-          ApiService.requestDeleteMeetings(this.state.user.id, jwt).then((result)=>{
+          ApiService.requestDeleteMeetings(this.state.user.id, jwt).then(()=>{
             localStorage.setItem('meeting', null);
           }).catch((err)=>{
             console.log(err);

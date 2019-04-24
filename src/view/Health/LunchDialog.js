@@ -9,7 +9,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Alarm from '@material-ui/icons/Alarm';
 import Slide from '@material-ui/core/Slide';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWeightHanging } from '@fortawesome/pro-solid-svg-icons';
+import { faWeightHanging, faWeight } from '@fortawesome/pro-solid-svg-icons';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Assignment from '@material-ui/icons/Assignment';
@@ -19,6 +19,7 @@ import Paper from '@material-ui/core/Paper';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 import { customEvent } from '../../library';
+import ApiService from '../../service/ApiService';
 
 const styleSheet = {
   appBar: {
@@ -39,6 +40,7 @@ const styleSheet = {
     textAlign: "center"
   },
   registryLunch: {
+    zIndex: "999",
     width: "100%", 
     position: "fixed", 
     marginTop:"64px", 
@@ -55,9 +57,9 @@ class LunchDialog extends Component {
     super(props, context);
     this.props = props;
     this.state = {
-      lunchType: false,
-      lunchHour: false,
-      lunchWeight: false,
+      name: "",
+      time: "",
+      weight: false,
       checkedTodos: false,
       checkedSeg: false,
       checkedTer: false,
@@ -65,11 +67,20 @@ class LunchDialog extends Component {
       checkedQui: false,
       checkedSex: false,
       checkedSab: false,
-      checkedDom: false
+      checkedDom: false,
+      user: JSON.parse(localStorage.getItem('user')),
+      jwt: localStorage.getItem('token'),
+      listLunches: []
     }
   }
 
   componentDidMount() {
+    ApiService.requestListHealth(`lunch/${this.state.user.id}`, this.state.jwt).then((result)=>{
+      this.state.listLunches =  result.lunches ? result.lunches : [];
+      this.setState(this.state);
+    }).catch((err)=>{
+      console.log("Error: ", err);
+    });
   }
 
   handleChange = name => event => {
@@ -94,8 +105,118 @@ class LunchDialog extends Component {
     }
   }
 
+  handleChangeInput = prop => event => {
+    this.setState({ [prop]: event.target.value });
+  };
+
+  saveLunchRegister() {
+    let lunchObj = {
+      user: this.state.user.id,
+      name: this.state.name,
+      time: this.state.time,
+      weight: this.state.weight,
+      monday: this.state.checkedSeg,
+      tuesday: this.state.checkedTer,
+      wednesday: this.state.checkedQua,
+      thursday: this.state.checkedQui,
+      friday: this.state.checkedSex,
+      saturday: this.state.checkedSab,
+      sunday: this.state.checkedDom
+    }
+    ApiService.requestSaveHealth('lunch', lunchObj, this.state.jwt).then((result)=>{
+      this.state.listLunches.push(result.lunch);
+      this.setState(this.state);
+      this.clearForm();
+    }).catch((err)=>{
+      console.log("Erro: ", err);
+    });
+  }
+  
+  clearForm() {
+    this.state = {
+      name: "",
+      time: "",
+      weight: false,
+      checkedTodos: false,
+      checkedSeg: false,
+      checkedTer: false,
+      checkedQua: false,
+      checkedQui: false,
+      checkedSex: false,
+      checkedSab: false,
+      checkedDom: false,
+    }
+    this.setState(this.state);
+  }
+
+  deleteLunch(id) { 
+    ApiService.requestDeleteHealth(`lunch/${id}`, this.state.jwt).then((result)=>{
+      ApiService.requestListHealth(`lunch/${this.state.user.id}`, this.state.jwt).then((result)=>{
+        this.state.listLunches = result.lunches ? result.lunches : [];
+        this.setState(this.state);
+      }).catch((err)=>{
+        console.log("Error: ", err);
+      });
+    }).catch((err)=>{
+      console.log("Error: ", err);
+    })
+  }
+
   render(){
     const { classes } = this.props;
+
+    let lunches = this.state.listLunches.map((lunch, index)=>{
+      return(
+      <Grid key={index} item xs={12} style={{marginBottom: "4px"}}>
+        <Paper style={{borderRight: '5px solid #ff7043'}}>
+          <Grid container style={{height: "80px"}}>
+            <Grid item xs={2}>
+              <Typography variant="display1" style={{fontSize: "24px", textAlign: "center", margin: "26px 0px 26px 0px"}}>
+                {lunch.time}
+              </Typography>
+            </Grid>
+            <Grid item xs={8} style={{padding: "0px 12px 0px 12px"}}>
+              <Typography variant="subheading" style={{padding: "8px 0px 8px 0px"}}>
+                {lunch.name}
+              </Typography>
+              <Typography variant="subheading">
+                  <FontAwesomeIcon icon={faWeight} />
+                  <div style={{display: "inline-block", padding: "0px 6px 0px 6px"}}>
+                  {lunch.weight}g
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.sunday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)" }}>
+                    D
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.monday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                    S
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.tuesday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                    T
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.wednesday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                    Q
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.thursday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                    Q
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.friday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                    S
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.saturday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                    S
+                  </div>
+              </Typography>
+            </Grid>
+            <Grid item xs={2} style={{textAlign: "right"}}>
+              <IconButton onClick={()=>{this.deleteLunch(lunch._id)}} aria-label="Delete" className={classes.margin}>
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Grid>
+          </Grid>
+        </Paper>
+      </Grid>
+      );
+    });
 
     return(
       <div>
@@ -121,13 +242,13 @@ class LunchDialog extends Component {
             </Typography>
             <div style={{padding: "0px 8px"}}>
               <Assignment className={classes.iconDesign} />
-              <TextField label="Tipo de Alimento" className={classes.inputDesign} />
+              <TextField label="Tipo de Alimento" value={this.state.name} className={classes.inputDesign}  onChange={this.handleChangeInput('name')}/>
             </div>
             <div style={{padding: "0px 8px"}}>
               <Alarm className={classes.iconDesign} />
-              <TextField label="Definir Hora" style={{width: "calc(50% - 50px)", marginRight: "16px"}} />
-              <FontAwesomeIcon icon={faWeightHanging} style={{margin: "20px 8px 4px 0px", fontSize: "22px"}}/>
-              <TextField label="Peso (grama)" style={{width: "calc(50% - 50px)"}}/>
+              <TextField label="Definir Hora" value={this.state.time} type="time" style={{width: "calc(50% - 50px)", marginRight: "16px"}}  onChange={this.handleChangeInput('time')}/>
+              <FontAwesomeIcon icon={faWeight} style={{margin: "20px 8px 4px 0px", fontSize: "22px"}}/>
+              <TextField label="Peso (grama)" value={this.state.weight} type="number" style={{width: "calc(50% - 50px)"}}  onChange={this.handleChangeInput('weight')}/>
             </div>
             <div>
               <Typography variant="body2" gutterBottom style={{marginTop: "12px", fontWeight: "600", textAlign: "center"}}>
@@ -215,64 +336,17 @@ class LunchDialog extends Component {
               </div>
             </div>
             <div style={{textAlign: "center", marginTop: "16px"}}>
-              <Button variant="outlined" color="primary" style={{fontWeight: "bold", margin: "0px 6px 0px 6px"}}>
+              <Button onClick={()=>{this.saveLunchRegister()}} variant="outlined" color="primary" style={{fontWeight: "bold", margin: "0px 6px 0px 6px"}}>
                 Salvar
               </Button>
-              <Button variant="outlined" color="secondary" style={{fontWeight: "bold", margin: "0px 6px 0px 6px"}}>
+              <Button onClick={()=>{this.clearForm()}} variant="outlined" color="secondary" style={{fontWeight: "bold", margin: "0px 6px 0px 6px"}}>
                 Limpar
               </Button>
             </div>
           </div>
           <div style={{marginTop: "382px"}}>
             <Grid container style={{padding: "0px 8px 0px 8px"}}>
-              <Grid item xs={12}>
-                <Paper>
-                  <Grid container style={{height: "80px"}}>
-                    <Grid item xs={2}>
-                      <Typography variant="display1" style={{fontSize: "24px", textAlign: "center", margin: "26px 0px 26px 0px"}}>
-                        18:30
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={8} style={{padding: "0px 12px 0px 12px"}}>
-                      <Typography variant="subheading" style={{padding: "8px 0px 8px 0px"}}>
-                        Ração do almoço
-                      </Typography>
-                      <Typography variant="subheading">
-                          <FontAwesomeIcon icon={faWeightHanging} />
-                          <div style={{display: "inline-block", padding: "0px 6px 0px 6px"}}>
-                          22kg
-                          </div>
-                          <div style={{display: "inline-block", padding: "0px 3px 0px 3px"}}>
-                            D
-                          </div>
-                          <div style={{display: "inline-block", padding: "0px 3px 0px 3px"}}>
-                            S
-                          </div>
-                          <div style={{display: "inline-block", padding: "0px 3px 0px 3px"}}>
-                            T
-                          </div>
-                          <div style={{display: "inline-block", padding: "0px 3px 0px 3px"}}>
-                            Q
-                          </div>
-                          <div style={{display: "inline-block", padding: "0px 3px 0px 3px"}}>
-                            Q
-                          </div>
-                          <div style={{display: "inline-block", padding: "0px 3px 0px 3px"}}>
-                            S
-                          </div>
-                          <div style={{display: "inline-block", padding: "0px 3px 0px 3px"}}>
-                            S
-                          </div>
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={2} style={{textAlign: "right"}}>
-                      <IconButton aria-label="Delete" className={classes.margin}>
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Grid>
-                  </Grid>
-                </Paper>
-              </Grid>
+              {lunches}
             </Grid>
           </div>
         </Dialog>

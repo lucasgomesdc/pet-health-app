@@ -29,7 +29,9 @@ class MeetingsDialog extends Component {
     this.props = props;
     this.state = {
       gps: [],
-      meetingList: []
+      meetingList: [],
+      meeting: JSON.parse(localStorage.getItem('meeting')),
+      jwt: localStorage.getItem('token')
     }
   }
 
@@ -46,6 +48,18 @@ class MeetingsDialog extends Component {
           this.state.meetingList = result;
         }
         this.setState(this.state);
+        if(this.state.meeting != null) {
+          let meetingObj = { 
+            gemonetry: {
+              coordinates: [this.state.gps.latitude, this.state.gps.longitude]
+            }
+          }
+          ApiService.requestUpdateMeetings(this.state.meeting.user, meetingObj, this.state.jwt).then((result) => {
+            localStorage.setItem('meeting', JSON.stringify(result.meeting));
+          }).catch((err)=>{
+            console.log(err);
+          });
+        }        
       }).catch((err)=>{
         console.log(err);
       });
