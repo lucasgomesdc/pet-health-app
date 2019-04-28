@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.health.pet" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Pet Health App</name>
+    <name>Pet Safe Care</name>
     <description>
         This is for educational underdegree
     </description>
@@ -27,6 +27,7 @@
     <plugin name="cordova-plugin-statusbar" spec="^2.4.2" />
     <plugin name="cordova-plugin-camera" spec="^4.0.3" />
     <plugin name="cordova-plugin-geolocation" spec="^4.0.1" />
+    <plugin name="cordova-plugin-call-number" spec="^1.0.1" />
     <engine name="android" spec="^7.1.1" />
     <engine name="browser" spec="^5.0.4" />
 </widget>

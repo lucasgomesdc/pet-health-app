@@ -34,6 +34,7 @@
     "chalk": "2.4.1",
     "cordova-android": "^7.1.1",
     "cordova-browser": "^5.0.4",
+    "cordova-plugin-call-number": "^1.0.1",
     "cordova-plugin-camera": "^4.0.3",
     "cordova-plugin-geolocation": "^4.0.1",
     "cordova-plugin-statusbar": "^2.4.2",
@@ -58,6 +59,7 @@
     "jest-pnp-resolver": "1.0.1",
     "jest-resolve": "23.6.0",
     "mini-css-extract-plugin": "0.4.3",
+    "moment": "^2.24.0",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.1.0",
     "postcss-flexbugs-fixes": "4.1.0",
@@ -71,6 +73,7 @@
     "react-leaflet": "^2.1.2",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
+    "react-text-mask": "^5.4.3",
     "resolve": "1.8.1",
     "sass-loader": "7.1.0",
     "style-loader": "0.23.0",
@@ -141,7 +144,8 @@
       "cordova-plugin-whitelist": {},
       "cordova-plugin-statusbar": {},
       "cordova-plugin-camera": {},
-      "cordova-plugin-geolocation": {}
+      "cordova-plugin-geolocation": {},
+      "cordova-plugin-call-number": {}
     },
     "platforms": [
       "android",

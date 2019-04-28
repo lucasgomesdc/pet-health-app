@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import MaskedInput from 'react-text-mask';
 import { withStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import Camera from '@material-ui/icons/CameraAlt';
@@ -13,17 +14,23 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography'
 import Fab from '@material-ui/core/Fab';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMars } from '@fortawesome/pro-solid-svg-icons';
-import { faVenus } from '@fortawesome/pro-solid-svg-icons';
-import { faWeight } from '@fortawesome/pro-solid-svg-icons';
-import { faChartNetwork } from '@fortawesome/pro-solid-svg-icons';
+import { faMars, faChartNetwork, faVenus, faWeight, faUserMd, faFlagCheckered } from '@fortawesome/pro-solid-svg-icons';
 import { customEvent } from '../../library';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import IconButton from '@material-ui/core/IconButton';
+import Grid from '@material-ui/core/Grid';
+import DeleteIcon from '@material-ui/icons/Delete';
+import Input from '@material-ui/core/Input';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
 
 import ApiService from '../../service/ApiService';
-
+import moment from 'moment';
 
 const styleSheet = {
   bigAvatar: {
@@ -46,6 +53,26 @@ const styleSheet = {
   }
 }
 
+function Transition(props) {
+  return <Slide direction="up" {...props} />;
+}
+
+function TextMaskCustom(props) {
+  const { inputRef, ...other } = props;
+
+  return (
+    <MaskedInput
+      {...other}
+      ref={ref => {
+        inputRef(ref ? ref.inputElement : null);
+      }}
+      mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+      placeholderChar={'\u2000'}
+      showMask
+    />
+  );
+}
+
 class MyPetView extends Component {
   constructor(props, context){
     super(props, context);
@@ -63,12 +90,21 @@ class MyPetView extends Component {
       castrated: null,
       user: "",
       showDetails: false,
+      jwt: localStorage.getItem('token'),
+      listLunches: [],
+      listMedicines: [],
+      listVacines: [],
+      openDialogPhone: false,
+      numberPhone: '(  )    -    ',
+      saveDisable: true
     }
   }
 
   componentDidMount() {
     customEvent('showBar', true);
+    customEvent('selectActiveAppBottomBar', 'home');
     this.state.user = JSON.parse(localStorage.getItem('user'));
+    this.loadHealth();
     let petInfo = JSON.parse(localStorage.getItem('pet'));
     if(petInfo != null){
       this.initStates(petInfo);
@@ -82,6 +118,7 @@ class MyPetView extends Component {
         console.log("Error ", err);
       });
     }
+
   }
 
   initStates(petInfo){
@@ -101,14 +138,277 @@ class MyPetView extends Component {
     this.setState(this.state);
   }
 
-  handleShowDetails(){
+  loadHealth() { 
+    let day;
+    let now = moment();
+    ApiService.requestListHealth(`lunch/${this.state.user.id}`, this.state.jwt).then((result)=>{
+      let lunches = result.lunches ? result.lunches : [];
+      lunches.forEach((lunch)=>{
+        day = now.format('dddd').toLowerCase();
+        if(lunch[day]){
+          this.state.listLunches.push(lunch);
+        }
+      });
+      ApiService.requestListHealth(`medicine/${this.state.user.id}`, this.state.jwt).then((result)=>{
+        let medicines = result.medicines ? result.medicines : [];
+        medicines.forEach((medicine)=>{
+          let start = moment(moment.utc(medicine.start).format('YYYY-MM-DD'));
+          let end;
+          if(medicine.end){
+            end = moment(moment.utc(medicine.end).format('YYYY-MM-DD'));
+            if(now >= start && now <= end){
+              this.state.listMedicines.push(medicine);
+            }
+          } else { 
+            if(now == start) {
+              this.state.listMedicines.push(medicine);
+            }
+          }
+        });
+        ApiService.requestListHealth(`vacine/${this.state.user.id}`, this.state.jwt).then((result)=>{
+          let vacines = result.vacines ? result.vacines : [];
+          vacines.forEach((vacine)=>{
+            let apply = moment(moment.utc(vacine.apply).format('YYYY-MM-DD'));
+            let reapply;
+            if(vacine.reapply) {
+              reapply = moment(moment.utc(vacine.reapply).format('YYYY-MM-DD'));
+              if(reapply == day) {
+                this.state.listVacines.push(vacine);
+              }
+            } else {
+              if(apply == day){
+                this.state.listVacines.push(vacine);
+              }
+            }
+          });
+          this.setState(this.state);
+        }).catch((err)=>{
+          console.log("Error: ", err);
+        });
+      }).catch((err)=>{
+        console.log("Error: ", err);
+      });
+    }).catch((err)=>{
+      console.log("Error: ", err);
+    });
+  }
+
+  handleShowDetails() {
     let showDetails = this.state.showDetails;
     this.state.showDetails = !showDetails;
     this.setState(this.state);
   }
 
-  render(){
+  healthScreen() {
+    this.props.history.push('/health');
+  }
+
+  handleDialogPhoneClickOpen = () => {
+    this.setState({ openDialogPhone: true });
+  };
+
+  handleDialogPhoneClose = () => {
+    this.setState({ openDialogPhone: false });
+  };
+
+  callEmergency() {
+    if(this.state.user.contactEmergency){
+      document.addEventListener('deviceready', ()=>{
+        window.plugins.CallNumber.callNumber(()=>{
+          console.log('Calling');
+        }, ()=>{
+          console.log('Not calling');
+        }, this.state.user.contactEmergency, false);
+      });
+    } else {
+      this.handleDialogPhoneClickOpen();
+    }
+  }
+
+  handleChangeNumberPhone(event){
+    this.state.numberPhone = event.target.value;
+    let validationNumber = this.state.numberPhone.replace(/\D+/g, '');
+    if(validationNumber.length == 10) {
+      this.state.saveDisable = false;
+    } else { 
+      this.state.saveDisable = true;
+    }
+    this.setState(this.state);
+  };
+
+  saveNumber(){
+    let number = this.state.numberPhone.replace(/\D+/g, '');
+    let userObj = { 
+      contactEmergency: number
+    }
+    ApiService.requestUpdateUser(this.state.user.id, userObj, this.state.jwt).then((result)=>{
+      this.state.user.contactEmergency = result.user.contactEmergency;
+      this.setState(this.state);
+      localStorage.setItem('user', JSON.stringify(this.state.user));
+    }).catch((err)=>{
+      console.log("Erro: ", err);
+    });
+    this.handleDialogPhoneClose();
+  }
+
+  render() {
     const { classes } = this.props;
+
+    let medicines = this.state.listMedicines.map((medicine, index)=>{
+      let dataEnd;
+      if(medicine.end) { 
+        dataEnd = moment.utc(medicine.end).format('DD/MM/YYYY');
+      }
+      return(
+        <Grid item xs={12} style={{marginBottom: "4px"}}>
+          <Paper style={{borderRight: '5px solid #80deea'}}>
+            <Grid container style={{height: "80px"}}>
+              <Grid item xs={2}>
+                <Typography variant="display1" style={{fontSize: "24px", textAlign: "center", margin: "26px 0px 26px 0px"}}>
+                  {medicine.time}
+                </Typography>
+              </Grid>
+              <Grid item xs={8} style={{padding: "0px 0px 0px 12px"}}>
+                <Typography variant="subheading" style={{padding: "8px 0px 8px 0px"}}>
+                  {medicine.name}
+                </Typography>
+                <Typography variant="subheading">
+                    <FontAwesomeIcon icon={faFlagCheckered} />
+                    {dataEnd ? 
+                      <div style={{display: "inline-block", padding: "0px 6px 0px 6px", marginRight: "22px"}}>
+                        {dataEnd}
+                      </div>
+                    :
+                      null
+                    }
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.sunday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)" }}>
+                      D
+                    </div>
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.monday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                      S
+                    </div>
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.tuesday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                      T
+                    </div>
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.wednesday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                      Q
+                    </div>
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.thursday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                      Q
+                    </div>
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.friday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                      S
+                    </div>
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.saturday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                      S
+                    </div>
+                </Typography>
+              </Grid>
+              <Grid item xs={2} style={{textAlign: "right"}}>
+                <IconButton onClick={()=>{this.deleteMedicine(medicine._id)}} aria-label="Delete" className={classes.margin}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+      );
+    });
+
+    let lunches = this.state.listLunches.map((lunch, index)=>{
+      return(
+      <Grid key={index} item xs={12} style={{marginBottom: "4px"}}>
+        <Paper style={{borderRight: '5px solid #ff7043'}}>
+          <Grid container style={{height: "80px"}}>
+            <Grid item xs={2}>
+              <Typography variant="display1" style={{fontSize: "24px", textAlign: "center", margin: "26px 0px 26px 0px"}}>
+                {lunch.time}
+              </Typography>
+            </Grid>
+            <Grid item xs={8} style={{padding: "0px 12px 0px 12px"}}>
+              <Typography variant="subheading" style={{padding: "8px 0px 8px 0px"}}>
+                {lunch.name}
+              </Typography>
+              <Typography variant="subheading">
+                  <FontAwesomeIcon icon={faWeight} />
+                  <div style={{display: "inline-block", padding: "0px 6px 0px 6px"}}>
+                  {lunch.weight}g
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.sunday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)" }}>
+                    D
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.monday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                    S
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.tuesday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                    T
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.wednesday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                    Q
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.thursday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                    Q
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.friday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                    S
+                  </div>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.saturday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                    S
+                  </div>
+              </Typography>
+            </Grid>
+            <Grid item xs={2} style={{textAlign: "right"}}>
+              <IconButton onClick={()=>{this.deleteLunch(lunch._id)}} aria-label="Delete" className={classes.margin}>
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Grid>
+          </Grid>
+        </Paper>
+      </Grid>
+      );
+    });
+
+    let vacines = this.state.listVacines.map((vacine, index)=>{
+      let dataApply, dataReApply;
+      if(vacine.apply) { 
+        dataApply = moment.utc(vacine.apply).format('DD/MM/YYYY');
+      }
+      if(vacine.reapply) {
+        dataReApply = moment.utc(vacine.reapply).format('DD/MM/YYYY');
+      }
+
+      return(
+        <Grid key={index} item xs={12} style={{marginBottom: "4px"}}>
+          <Paper style={{borderRight: '5px solid #90caf9'}}>
+            <Grid container style={{height: "80px"}}>
+              <Grid item xs={4}>
+                <Typography variant="display1" style={{fontSize: "18px", textAlign: "center", margin: "12px 0px"}}>
+                  {dataApply}
+                </Typography>
+                <Typography variant="display1" style={{fontSize: "18px", textAlign: "center", margin: "12px 0px"}}>
+                  {dataReApply}
+                </Typography>
+              </Grid>
+              <Grid item xs={6} style={{padding: "0px 12px 0px 12px"}}>
+                <Typography variant="title" style={{padding: "8px 0px 8px 0px"}}>
+                  {vacine.name}
+                </Typography>
+                <Typography variant="subheading">
+                  <FontAwesomeIcon icon={faUserMd} style={{marginRight: "8px"}}/>
+                  {vacine.applyBy}
+                </Typography>
+              </Grid>
+              <Grid item xs={2} style={{textAlign: "right"}}>
+                <IconButton onClick={()=>{this.deleteVacine(vacine._id)}} aria-label="Delete" className={classes.margin}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+      );
+    });
+
     return(
       <div style={{padding: "0px 8px"}}>
         <Paper>
@@ -189,6 +489,7 @@ class MyPetView extends Component {
         </Paper>
         <div style={{padding: "20px", textAlign: "center"}}>
           <Fab
+            onClick={()=>{this.callEmergency('31663836')}}
             variant="extended"
             size="medium"
             style={{backgroundColor: "#4caf50", color: "white", width: "188px"}}
@@ -199,11 +500,59 @@ class MyPetView extends Component {
             Emergência
           </Fab>
         </div>
+        {lunches.length == 0 && medicines.length == 0 && vacines.length == 0 ?
         <div style={{height: "250px", width: "100%", position: "relative"}}>
             <div style={{  position: "absolute" , top: "125px", right: 0, left: 0, margin: "auto", textAlign: "center"}}>
-              Não há registro de tarefas adicionado!
+              Não encontrei nenhum registro de saúde
+              <div>
+                <Button onClick={()=>{this.healthScreen()}} color="primary" className={classes.button}>
+                  Adicionar
+                </Button>
+              </div>
             </div>
         </div>
+        :
+        <div>
+          <Grid container>
+            {lunches}
+            {medicines}
+            {vacines}
+          </Grid>
+        </div>
+        }
+        <Dialog
+          open={this.state.openDialogPhone}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={this.handleDialogPhoneClose}
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle id="alert-dialog-slide-title">
+            {"Configure um número para chamada de emergência!"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-slide-description">
+              Ao clicar no botão seu dispositivo iniciará uma chamada de ligação para o número configurado.
+            </DialogContentText>
+            <div style={{textAlign: "center", marginTop: "8px"}}>
+              <Input
+                value={this.state.numberPhone}
+                onChange={(evt)=>{this.handleChangeNumberPhone(evt)}}
+                id="formatted-text-mask-input"
+                inputComponent={TextMaskCustom}
+              />
+            </div>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleDialogPhoneClose} color="primary">
+              Cancelar
+            </Button>
+            <Button onClick={()=>{this.saveNumber()}} color="primary" disabled={this.state.saveDisable}>
+              Salvar
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }

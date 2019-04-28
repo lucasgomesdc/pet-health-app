@@ -29,23 +29,31 @@ class AppBottomBar extends Component {
     super(props, context);
     this.props = props;
     this.state = {
-      value: 'recents',
+      value: 'home',
     };
+    this.selectActiveAppBottomBarFn = (event)=>{this.selectActiveAppBottomBar(event.detail)};
+    window.addEventListener('selectActiveAppBottomBar', this.selectActiveAppBottomBarFn);
   }
 
-  componentDidMount() {
+  selectActiveAppBottomBar(value) {
+    this.state.value = value;
+    this.setState(this.state);
   }
 
-  handleChange = (event, page) => {
-    this.setState({ page });
+  componentWillUnmount() { 
+    window.removeEventListener('selectActiveAppBottomBar', this.selectActiveAppBottomBarFn);
+  }
+
+  handleChange = (event, value) => {
+    this.setState({ value });
   };
 
   render(){
     const { classes } = this.props;
 
     return(
-      <BottomNavigation value={this.state.page} onChange={this.handleChange} className={classes.bottomBar}>
-        <BottomNavigationAction className={classes.menuNav} component={Link} to="/" value="" icon={<Pets />} />
+      <BottomNavigation value={this.state.value} onChange={this.handleChange} className={classes.bottomBar}>
+        <BottomNavigationAction className={classes.menuNav} component={Link} to="/" value="home" icon={<Pets />} />
         <BottomNavigationAction className={classes.menuNav} component={Link} to="/health" value="health" icon={<FavoriteIcon />} />
         <BottomNavigationAction className={classes.menuNav} component={Link} to="/local" value="local" icon={<Map />} />
         <BottomNavigationAction className={classes.menuNav} component={Link} to="/petService" value="petService" icon={<Settings />} />

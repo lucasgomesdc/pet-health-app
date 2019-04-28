@@ -24,6 +24,7 @@ class LocalView extends Component {
 
   componentDidMount() {
     customEvent('showBar', true);
+    customEvent('selectActiveAppBottomBar', 'local');
   }
 
   handleChange = (event, value) => {

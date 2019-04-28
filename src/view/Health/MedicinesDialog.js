@@ -12,6 +12,16 @@ import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 import Event from '@material-ui/icons/Event';
+import Alarm from '@material-ui/icons/Alarm';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWeightHanging, faWeight } from '@fortawesome/pro-solid-svg-icons';
+import { faFlagCheckered } from '@fortawesome/pro-light-svg-icons';
+import DeleteIcon from '@material-ui/icons/Delete';
+import moment from 'moment';
+
+import ApiService from '../../service/ApiService';
 
 const styleSheet = {
   dayCheckbox: {
@@ -53,6 +63,10 @@ class MedicinesDialog extends Component {
     super(props, context);
     this.props = props;
     this.state = {
+      name: "",
+      time: "",
+      start: "",
+      end: "",
       checkedTodos: false,
       checkedSeg: false,
       checkedTer: false,
@@ -60,11 +74,20 @@ class MedicinesDialog extends Component {
       checkedQui: false,
       checkedSex: false,
       checkedSab: false,
-      checkedDom: false
+      checkedDom: false,
+      listMedicines: [],
+      user: JSON.parse(localStorage.getItem('user')),
+      jwt: localStorage.getItem('token'),
     }
   }
 
   componentDidMount() {
+    ApiService.requestListHealth(`medicine/${this.state.user.id}`, this.state.jwt).then((result)=>{
+      this.state.listMedicines =  result.medicines ? result.medicines : [];
+      this.setState(this.state);
+    }).catch((err)=>{
+      console.log("Error: ", err);
+    });
   }  
 
   handleChange = name => event => {
@@ -89,8 +112,130 @@ class MedicinesDialog extends Component {
     }
   }
 
+  handleChangeInput = prop => event => {
+    this.setState({ [prop]: event.target.value });
+  };
+
+  saveMedicineRegister() {
+    let medicineObj = {
+      user: this.state.user.id,
+      name: this.state.name,
+      time: this.state.time,
+      start: this.state.start,
+      end: this.state.end,
+      monday: this.state.checkedSeg,
+      tuesday: this.state.checkedTer,
+      wednesday: this.state.checkedQua,
+      thursday: this.state.checkedQui,
+      friday: this.state.checkedSex,
+      saturday: this.state.checkedSab,
+      sunday: this.state.checkedDom
+    }
+
+    ApiService.requestSaveHealth('medicine', medicineObj, this.state.jwt).then((result)=>{
+      this.state.listMedicines.push(result.medicine);
+      this.setState(this.state);
+      this.clearForm();
+    }).catch((err)=>{
+      console.log("Erro: ", err);
+    });
+  }
+
+  clearForm() {
+    this.state = {
+      name: "",
+      time: "",
+      start: "",
+      end: "",
+      checkedTodos: false,
+      checkedSeg: false,
+      checkedTer: false,
+      checkedQua: false,
+      checkedQui: false,
+      checkedSex: false,
+      checkedSab: false,
+      checkedDom: false,
+    }
+    this.setState(this.state);
+  }
+
+  deleteMedicine(id) { 
+    ApiService.requestDeleteHealth(`medicine/${id}`, this.state.jwt).then((result)=>{
+      ApiService.requestListHealth(`medicine/${this.state.user.id}`, this.state.jwt).then((result)=>{
+        this.state.listMedicines = result.medicines ? result.medicines : [];
+        this.setState(this.state);
+      }).catch((err)=>{
+        console.log("Error: ", err);
+      });
+    }).catch((err)=>{
+      console.log("Error: ", err);
+    })
+  }
+
   render(){
     const { classes } = this.props;
+
+    let medicines = this.state.listMedicines.map((medicine, index)=>{
+      let dataEnd;
+      if(medicine.end) { 
+        dataEnd = moment.utc(medicine.end).format('DD/MM/YYYY');
+      }
+      return(
+        <Grid item xs={12} style={{marginBottom: "4px"}}>
+          <Paper style={{borderRight: '5px solid #80deea'}}>
+            <Grid container style={{height: "80px"}}>
+              <Grid item xs={2}>
+                <Typography variant="display1" style={{fontSize: "24px", textAlign: "center", margin: "26px 0px 26px 0px"}}>
+                  {medicine.time}
+                </Typography>
+              </Grid>
+              <Grid item xs={8} style={{padding: "0px 0px 0px 12px"}}>
+                <Typography variant="subheading" style={{padding: "8px 0px 8px 0px"}}>
+                  {medicine.name}
+                </Typography>
+                <Typography variant="subheading">
+                    <FontAwesomeIcon icon={faFlagCheckered} />
+                    {dataEnd ? 
+                      <div style={{display: "inline-block", padding: "0px 6px 0px 6px", marginRight: "22px"}}>
+                        {dataEnd}
+                      </div>
+                    :
+                      null
+                    }
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.sunday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)" }}>
+                      D
+                    </div>
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.monday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                      S
+                    </div>
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.tuesday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                      T
+                    </div>
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.wednesday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                      Q
+                    </div>
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.thursday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                      Q
+                    </div>
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.friday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                      S
+                    </div>
+                    <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.saturday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
+                      S
+                    </div>
+                </Typography>
+              </Grid>
+              <Grid item xs={2} style={{textAlign: "right"}}>
+                <IconButton onClick={()=>{this.deleteMedicine(medicine._id)}} aria-label="Delete" className={classes.margin}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+      );
+    });
+
     return(
       <div>
         <Dialog
@@ -115,13 +260,15 @@ class MedicinesDialog extends Component {
             </Typography>
             <div style={{padding: "0px 8px"}}>
               <Assignment className={classes.iconDesign} />
-              <TextField label="Nome do Remédio" className={classes.inputDesign} />
+              <TextField label="Nome do Remédio" onChange={this.handleChangeInput('name')} value={this.state.name} style={{width: "calc(60% - 50px)", marginRight: "16px"}} />
+              <Alarm className={classes.iconDesign} />
+              <TextField label="Definir Hora" onChange={this.handleChangeInput('time')} value={this.state.time} type="time" style={{width: "calc(40% - 50px)", marginRight: "16px"}}/>
             </div>
             <div style={{padding: "0px 8px"}}>
               <Event className={classes.iconDesign} />
-              <TextField label="Data do Começo" style={{width: "calc(50% - 50px)", marginRight: "16px"}} />
+              <TextField label="Data do Começo" onChange={this.handleChangeInput('start')} type="date" value={this.state.start} style={{width: "calc(50% - 50px)", marginRight: "16px"}} />
               <Event className={classes.iconDesign} />
-              <TextField label="Data do Fim" style={{width: "calc(50% - 50px)"}}/>
+              <TextField label="Data do Fim" onChange={this.handleChangeInput('end')} type="date" value={this.state.end} style={{width: "calc(50% - 50px)"}}/>
             </div>
             <div>
               <Typography variant="body2" gutterBottom style={{marginTop: "12px", fontWeight: "600", textAlign: "center"}}>
@@ -209,13 +356,18 @@ class MedicinesDialog extends Component {
               </div>
             </div>
             <div style={{textAlign: "center", marginTop: "16px"}}>
-              <Button variant="outlined" color="primary" style={{fontWeight: "bold", margin: "0px 6px 0px 6px"}}>
+              <Button onClick={()=>{this.saveMedicineRegister()}} variant="outlined" color="primary" style={{fontWeight: "bold", margin: "0px 6px 0px 6px"}}>
                 Salvar
               </Button>
               <Button variant="outlined" color="secondary" style={{fontWeight: "bold", margin: "0px 6px 0px 6px"}}>
                 Limpar
               </Button>
             </div>
+          </div>
+          <div style={{marginTop: "382px"}}>
+            <Grid container style={{padding: "0px 8px 0px 8px"}}>
+              {medicines}
+            </Grid>
           </div>
         </Dialog>
       </div>

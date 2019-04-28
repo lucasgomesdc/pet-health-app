@@ -30,6 +30,7 @@ class HealthView extends Component {
 
   componentDidMount() {
     customEvent('showBar', true);
+    customEvent('selectActiveAppBottomBar', 'health');
   }
 
   handleClickOpen(value){

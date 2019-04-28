@@ -127,6 +127,8 @@ class AuthenticateView extends Component {
         nome: result.user.name,
         email: result.user.email,
         meetings: result.user.meetings,
+        instagram: result.user.instagram,
+        contactEmergency: result.user.contactEmergency ? result.user.contactEmergency : null
       }
       let jwt = result.token;
 
@@ -136,7 +138,7 @@ class AuthenticateView extends Component {
       //Antes de ir pra home, verifica se o pet já está criado com request
       ApiService.requestPet(user.id, jwt).then((pet)=>{
         if(pet){ 
-          this.props.history.push('/');
+          this.props.history.replace('/');
         }else{
           this.state.openModal = true;
           this.setState(this.state);

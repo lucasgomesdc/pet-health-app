@@ -29,6 +29,7 @@ class PetSettingsView extends Component {
 
   componentDidMount() {
     customEvent('showBar', true);
+    customEvent('selectActiveAppBottomBar', 'petService');
     if(this.state.user.meetings){
       this.state.checkedMeetings = true;
     }
