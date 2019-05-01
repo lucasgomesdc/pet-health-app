@@ -139,58 +139,60 @@ class MyPetView extends Component {
   }
 
   loadHealth() { 
-    let day;
-    let now = moment();
-    ApiService.requestListHealth(`lunch/${this.state.user.id}`, this.state.jwt).then((result)=>{
-      let lunches = result.lunches ? result.lunches : [];
-      lunches.forEach((lunch)=>{
-        day = now.format('dddd').toLowerCase();
-        if(lunch[day]){
-          this.state.listLunches.push(lunch);
-        }
-      });
-      ApiService.requestListHealth(`medicine/${this.state.user.id}`, this.state.jwt).then((result)=>{
-        let medicines = result.medicines ? result.medicines : [];
-        medicines.forEach((medicine)=>{
-          let start = moment(moment.utc(medicine.start).format('YYYY-MM-DD'));
-          let end;
-          if(medicine.end){
-            end = moment(moment.utc(medicine.end).format('YYYY-MM-DD'));
-            if(now >= start && now <= end){
-              this.state.listMedicines.push(medicine);
-            }
-          } else { 
-            if(now == start) {
-              this.state.listMedicines.push(medicine);
-            }
+    if(this.state.user.id) { 
+      let day;
+      let now = moment();
+      ApiService.requestListHealth(`lunch/${this.state.user.id}`, this.state.jwt).then((result)=>{
+        let lunches = result.lunches ? result.lunches : [];
+        lunches.forEach((lunch)=>{
+          day = now.format('dddd').toLowerCase();
+          if(lunch[day]){
+            this.state.listLunches.push(lunch);
           }
         });
-        ApiService.requestListHealth(`vacine/${this.state.user.id}`, this.state.jwt).then((result)=>{
-          let vacines = result.vacines ? result.vacines : [];
-          vacines.forEach((vacine)=>{
-            let apply = moment(moment.utc(vacine.apply).format('YYYY-MM-DD'));
-            let reapply;
-            if(vacine.reapply) {
-              reapply = moment(moment.utc(vacine.reapply).format('YYYY-MM-DD'));
-              if(reapply == day) {
-                this.state.listVacines.push(vacine);
+        ApiService.requestListHealth(`medicine/${this.state.user.id}`, this.state.jwt).then((result)=>{
+          let medicines = result.medicines ? result.medicines : [];
+          medicines.forEach((medicine)=>{
+            let start = moment(moment.utc(medicine.start).format('YYYY-MM-DD'));
+            let end;
+            if(medicine.end){
+              end = moment(moment.utc(medicine.end).format('YYYY-MM-DD'));
+              if(now >= start && now <= end){
+                this.state.listMedicines.push(medicine);
               }
-            } else {
-              if(apply == day){
-                this.state.listVacines.push(vacine);
+            } else { 
+              if(now == start) {
+                this.state.listMedicines.push(medicine);
               }
             }
           });
-          this.setState(this.state);
+          ApiService.requestListHealth(`vacine/${this.state.user.id}`, this.state.jwt).then((result)=>{
+            let vacines = result.vacines ? result.vacines : [];
+            vacines.forEach((vacine)=>{
+              let apply = moment(moment.utc(vacine.apply).format('YYYY-MM-DD'));
+              let reapply;
+              if(vacine.reapply) {
+                reapply = moment(moment.utc(vacine.reapply).format('YYYY-MM-DD'));
+                if(reapply == day) {
+                  this.state.listVacines.push(vacine);
+                }
+              } else {
+                if(apply == day){
+                  this.state.listVacines.push(vacine);
+                }
+              }
+            });
+            this.setState(this.state);
+          }).catch((err)=>{
+            console.log("Error: ", err);
+          });
         }).catch((err)=>{
           console.log("Error: ", err);
         });
       }).catch((err)=>{
         console.log("Error: ", err);
       });
-    }).catch((err)=>{
-      console.log("Error: ", err);
-    });
+    }
   }
 
   handleShowDetails() {

@@ -21,9 +21,9 @@ class PetSettingsView extends Component {
     this.state = {
       checkedMeetings: false,
       instagram: "",
-      GPS: {},
       user: JSON.parse(localStorage.getItem('user')),
-      pet: JSON.parse(localStorage.getItem('pet'))
+      pet: JSON.parse(localStorage.getItem('pet')),
+      GPS:  JSON.parse(localStorage.getItem('GPS'))
     }
   }
 
@@ -66,8 +66,11 @@ class PetSettingsView extends Component {
   }
 
   logoff(){
-    localStorage.setItem('token', null);
     localStorage.setItem('user', null);
+    localStorage.setItem('pet', null);
+    localStorage.setItem('token', null);
+    localStorage.setItem('meeting', null);
+    localStorage.setItem('GPS', null);
     customEvent('showBar', false);
     this.props.history.push('/auth');
   }

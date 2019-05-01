@@ -11,6 +11,17 @@ import IconButton from '@material-ui/core/IconButton';
 import Map from '@material-ui/icons/Map';
 import Button from '@material-ui/core/Button';
 import Security from '@material-ui/icons/Security';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faThumbsUp as likeSolid, faThumbsDown as dislikeSolid } from '@fortawesome/pro-solid-svg-icons';
+import { faShieldCheck, faMapMarked } from '@fortawesome/pro-regular-svg-icons';
+import { faThumbsUp as likeLight, faThumbsDown as dislikeLight, faCommentAltSmile } from '@fortawesome/pro-light-svg-icons';
 
 import { customEvent } from '../../library';
 import ApiService from '../../service/ApiService';
@@ -41,7 +52,23 @@ const styleSheet = {
     right: "1%",
     backgroundColor: "rgba(0, 0, 0, 0.4)",
     color: "white"
+  },
+  svgIcon: {
+    color: "rgba(0, 0, 0, 0.54)",
+    width: "1em",
+    height: "1em",
+    display: "inline-block",
+    fontSize: "24px",
+  },
+  button: {
+    "&:hover": {
+      backgroundColor: "transparent"
+    }
   }
+}
+
+function Transition(props) {
+  return <Slide direction="down" {...props} />;
 }
 
 class LocalView extends Component {
@@ -49,36 +76,36 @@ class LocalView extends Component {
     super(props, context);
     this.props = props;
     this.state = {
-      local: { 
-        "_id": "5cc60461a4c6702e781253b8",
-        "__v": 0,
-        "securityDislike": 0,
-        "securityLike": 0,
-        "diseaseDislike": 0,
-        "diseaseLike": 0,
-        "cleanDislike": 0,
-        "cleanLike": 0,
-        "like": 0,
-        "address": "Av. Afonso Pena, 1377 - Centro, Belo Horizonte - MG, 30130-002",
-        "media": "https://s3-sa-east-1.amazonaws.com/pet-health-storage/image-local/parque-municipal.png",
-        "name": "Parque Municipal",
-        "geometry": {
-          "coordinates": [
-              -19.924449,
-              -43.935141
-          ],
-          "type": "Point"
-        }
-      },
       listLocals: [],
       user: JSON.parse(localStorage.getItem('user')),
-      jwt: localStorage.getItem('token')
+      localId: "",
+      jwt: localStorage.getItem('token'),
+      localRate: "",
+      localClean: true,
+      localSecurity: true,
+      localDisease: true,
+      openDialog: false,
+      loading: false,
+      likeClean: false,
+      likeSecurity: false,
+      likeDisease: false,
+      dislikeClean: false,
+      dislikeSecurity: false,
+      dislikeDisease: false,
+      clean: null,
+      security: null,
+      disease: null,
+      ratingEnd: false
     }
+    this.index = 0;
   }
 
   componentDidMount() {
     customEvent('showBar', true);
+    customEvent('handleOpenAddIcon', true);
     customEvent('selectActiveAppBottomBar', 'local');
+    this.state.loading = true;
+    this.setState(this.state);
     
     GPSService.initGPS((position)=>{
       this.state.gps = { 
@@ -91,11 +118,18 @@ class LocalView extends Component {
         if(result){
           this.state.listLocals = result;
         }
+        this.state.loading = false;
         this.setState(this.state);
       }).catch((err)=>{
+        this.state.loading = false;
+        this.setState(this.state);
         console.log(err);
       });
     });
+  }
+
+  componentWillUnmount() {
+    customEvent('handleOpenAddIcon', false);
   }
 
   registerLike(localId, index) { 
@@ -106,9 +140,72 @@ class LocalView extends Component {
       console.log(err);
     });
   }
+
+  handleCloseDialog = () => {
+    this.setState({ openDialog: false, ratingEnd: false });
+  };
+
+  openRatingDialog(local, index) {
+    this.state.localRate = local.name;
+    this.state.localId = local._id;
+    this.index = index;
+    this.state.openDialog = true;
+    this.setState(this.state);
+  }
+
+  onClickRating(prop, value) { 
+    if(prop == "clean"){
+      this.state.clean = value;
+      if(value == true){
+        this.state.likeClean = true;
+        this.state.dislikeClean = false;
+      } else {
+        this.state.likeClean = false;
+        this.state.dislikeClean = true;
+      }
+    }
+    if(prop == "disease"){
+      this.state.disease = value;
+      if(value == true){
+        this.state.likeDisease = true;
+        this.state.dislikeDisease = false;
+      } else {
+        this.state.likeDisease = false;
+        this.state.dislikeDisease = true;
+      }
+    }
+    if(prop == "security"){
+      this.state.security = value;
+      if(value == true){
+        this.state.likeSecurity = true;
+        this.state.dislikeSecurity = false;
+      } else {
+        this.state.likeSecurity = false;
+        this.state.dislikeSecurity = true;
+      }
+    }
+    this.setState(this.state);
+  }
+
+  saveRating() { 
+    let ratingObj = {
+      clean: this.state.clean,
+      disease: this.state.disease,
+      security: this.state.security
+    }
+    ApiService.requestRatingLocal(this.state.user.id, this.state.localId, ratingObj, this.state.jwt).then((result)=>{
+      this.state.listLocals[this.index].safety = result.safety;
+      this.state.ratingEnd = true;
+      this.setState(this.state);
+    }).catch((err)=>{
+      console.log("Error: ", err);
+    });
+  }
   
   render(){
     const { classes } = this.props;
+
+    let loading = true;
 
     let locals = this.state.listLocals.map((local, index)=> {
       return(
@@ -121,7 +218,7 @@ class LocalView extends Component {
             image={local.media}
             title={local.name}
           />
-          <Button className={classes.rateButton}>
+          <Button onClick={()=>{this.openRatingDialog(local, index)}} className={classes.rateButton}>
             Avaliar
           </Button>
           <CardContent style={{padding: "8px 16px 0px 16px"}} >
@@ -134,18 +231,18 @@ class LocalView extends Component {
               <FavoriteBorder />
             </IconButton>
             {local.like > 0 ? 
-            <Typography>
+            <Typography style={{marginRight: "12px"}}>
               {local.like}
             </Typography>
             :
-            null
+              null
             }
-            <Security style={{color: "rgba(0, 0, 0, 0.54)"}}/>
+            <FontAwesomeIcon icon={ faShieldCheck } style={{color: "rgba(0, 0, 0, 0.54)", width: "21px", height: "21px"}}/>
             <Typography>
-              75%
+              {local.safety}%
             </Typography>
             <IconButton className={classes.button} aria-label="map">
-              <Map />
+              <FontAwesomeIcon icon={ faMapMarked } className={classes.svgIcon}/>
             </IconButton>
           </CardActions>
         </Card>
@@ -154,9 +251,134 @@ class LocalView extends Component {
 
     return(
       <div>
-        {locals}
+        {this.state.loading ? 
+        <div style={{width: "100%", textAlign: "center", paddingTop: "50%"}}>
+          <CircularProgress className={classes.progress} />
+          <Typography style={{width: "100%", textAlign: "center", marginTop: "16px"}}>
+            Carregando lugares ...
+          </Typography>
+        </div>
+        :
+        locals
+        }
         <div style={{height: "50px"}}>
         </div>
+        <Dialog
+          open={this.state.openDialog}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={this.handleCloseDialog}
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle id="alert-dialog-slide-title">
+            {this.state.ratingEnd ? "Avaliação enviada!" : "Avaliar "+this.state.localRate}
+          </DialogTitle>
+          {this.state.ratingEnd ? 
+          <DialogContent style={{marginTop: "16px"}}>
+            <div style={{textAlign: "center"}}>
+              <FontAwesomeIcon icon={ faCommentAltSmile } style={{color: "rgba(0, 0, 0, 0.54)", width: "50px", height: "50px"}}/>
+            </div>
+            <Typography style={{textAlign: "center"}}>
+              Obrigado por avaliar!
+            </Typography>
+          </DialogContent>
+          :
+          <DialogContent>
+            <div style={{textAlign: "center", margin:"10px 0px"}}>
+              <Typography>
+                Livre de doenças
+              </Typography>
+              <div>
+                {this.state.likeDisease ? 
+                <IconButton className={classes.button} disableRipple={true} aria-label="like">
+                  <FontAwesomeIcon icon={ likeSolid } style={{color: "#4caf50"}}/>
+                </IconButton>
+                :
+                <IconButton onClick={()=>this.onClickRating('disease', true)} className={classes.button} disableRipple={true} aria-label="like">
+                  <FontAwesomeIcon icon={ likeLight } style={{color: "rgba(0, 0, 0, 0.54)"}}/>
+                </IconButton>
+                }
+                {this.state.dislikeDisease ? 
+                <IconButton className={classes.button} disableRipple={true} aria-label="like">
+                  <FontAwesomeIcon icon={ dislikeSolid } style={{color: "#f44336"}}/>
+                </IconButton>
+                :
+                <IconButton onClick={()=>this.onClickRating('disease', false)} className={classes.button} disableRipple={true} aria-label="like">
+                  <FontAwesomeIcon icon={ dislikeLight } style={{color: "rgba(0, 0, 0, 0.54)"}}/>
+                </IconButton>
+                }
+              </div>
+            </div>
+            <div style={{textAlign: "center", margin:"10px 0px"}}>
+              <Typography>
+                Limpeza
+              </Typography>
+              <div>
+                {this.state.likeClean ? 
+                <IconButton className={classes.button} disableRipple={true} aria-label="like">
+                  <FontAwesomeIcon icon={ likeSolid } style={{color: "#4caf50"}}/>
+                </IconButton>
+                :
+                <IconButton onClick={()=>this.onClickRating('clean', true)} className={classes.button} disableRipple={true} aria-label="like">
+                  <FontAwesomeIcon icon={ likeLight } style={{color: "rgba(0, 0, 0, 0.54)"}}/>
+                </IconButton>
+                }
+                {this.state.dislikeClean ? 
+                <IconButton className={classes.button} disableRipple={true} aria-label="like">
+                  <FontAwesomeIcon icon={ dislikeSolid } style={{color: "#f44336"}}/>
+                </IconButton>
+                :
+                <IconButton onClick={()=>this.onClickRating('clean', false)} className={classes.button} disableRipple={true} aria-label="like">
+                  <FontAwesomeIcon icon={ dislikeLight } style={{color: "rgba(0, 0, 0, 0.54)"}}/>
+                </IconButton>
+                }
+              </div>
+            </div>
+            <div style={{textAlign: "center", margin:"10px 0px"}}>
+              <Typography>
+                Segurança
+              </Typography>
+              <div>
+                {this.state.likeSecurity ? 
+                <IconButton className={classes.button} disableRipple={true} aria-label="like">
+                  <FontAwesomeIcon icon={ likeSolid } style={{color: "#4caf50"}}/>
+                </IconButton>
+                :
+                <IconButton onClick={()=>this.onClickRating('security', true)} className={classes.button} disableRipple={true} aria-label="like">
+                  <FontAwesomeIcon icon={ likeLight } style={{color: "rgba(0, 0, 0, 0.54)"}}/>
+                </IconButton>
+                }
+                {this.state.dislikeSecurity ? 
+                <IconButton className={classes.button} disableRipple={true} aria-label="like">
+                  <FontAwesomeIcon icon={ dislikeSolid } style={{color: "#f44336"}}/>
+                </IconButton>
+                :
+                <IconButton onClick={()=>this.onClickRating('security', false)} className={classes.button} disableRipple={true} aria-label="like">
+                  <FontAwesomeIcon icon={ dislikeLight } style={{color: "rgba(0, 0, 0, 0.54)"}}/>
+                </IconButton>
+                }
+              </div>
+            </div>
+          </DialogContent>
+          }
+          {this.state.ratingEnd ? 
+          <DialogActions>
+            <Button onClick={this.handleCloseDialog} color="primary">
+              Fechar
+            </Button>
+          </DialogActions>
+          :
+          <DialogActions>
+            <Button onClick={this.handleCloseDialog} color="secondary">
+              Cancelar
+            </Button>
+            <Button onClick={()=>{this.saveRating()}} disabled={this.state.clean != null && this.state.security != null && this.state.disease != null ? false : true} color="primary">
+              Confirmar
+            </Button>
+          </DialogActions>
+          }
+        </Dialog>
       </div>
     );
   }

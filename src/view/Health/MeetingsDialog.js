@@ -77,8 +77,8 @@ class MeetingsDialog extends Component {
             backgroundImage: `url('${meeting.pet.media}')`, 
             width: "25%", 
             height: "100px",
-            backgroundPosition: "center center",
-            backgroundRepeat: "no-repeat"
+            backgroundSize: "cover",
+            backgroundPosition: "center"
           }}>
           </div>
           <div style={{width: "60%", padding: "12px"}}>

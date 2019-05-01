@@ -7,7 +7,7 @@ import RestoreIcon from '@material-ui/icons/Restore';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import Pets from '@material-ui/icons/Pets';
-import Map from '@material-ui/icons/Map';
+import Place from '@material-ui/icons/Place';
 import Store from '@material-ui/icons/Store';
 import Settings from '@material-ui/icons/Settings';
 import { Link } from 'react-router-dom';
@@ -52,11 +52,11 @@ class AppBottomBar extends Component {
     const { classes } = this.props;
 
     return(
-      <BottomNavigation value={this.state.value} onChange={this.handleChange} className={classes.bottomBar}>
-        <BottomNavigationAction className={classes.menuNav} component={Link} to="/" value="home" icon={<Pets />} />
-        <BottomNavigationAction className={classes.menuNav} component={Link} to="/health" value="health" icon={<FavoriteIcon />} />
-        <BottomNavigationAction className={classes.menuNav} component={Link} to="/local" value="local" icon={<Map />} />
-        <BottomNavigationAction className={classes.menuNav} component={Link} to="/petService" value="petService" icon={<Settings />} />
+      <BottomNavigation value={this.state.value} onChange={this.handleChange} className={classes.bottomBar} showLabels >
+        <BottomNavigationAction className={classes.menuNav} label="Meu Pet" component={Link} to="/" value="home" icon={<Pets />} />
+        <BottomNavigationAction className={classes.menuNav} label="Saúde" component={Link} to="/health" value="health" icon={<FavoriteIcon />} />
+        <BottomNavigationAction className={classes.menuNav} label="Lugares" component={Link} to="/local" value="local" icon={<Place />} />
+        <BottomNavigationAction className={classes.menuNav} label="Ajustes" component={Link} to="/petService" value="petService" icon={<Settings />} />
       </BottomNavigation>
     );
   }

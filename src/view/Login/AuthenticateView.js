@@ -8,8 +8,7 @@ import TextField from '@material-ui/core/TextField';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Lock from '@material-ui/icons/Lock';
 import Button from '@material-ui/core/Button';
-
-
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -36,12 +35,14 @@ const styleSheet = {
   loginPaper: { 
     height: "300px",
     width: "calc(100% - 50px)",
-    margin: "0px auto 50px"
+    margin: "0px auto 50px",
+    position: "relative"
   },
   registerPaper: {
     height: "415px",
     width: "calc(100% - 50px)",
-    margin: "0px auto 50px"
+    margin: "0px auto 50px",
+    position: "relative"
   },
   iconDesign: {
     height: "100%", 
@@ -57,6 +58,13 @@ const styleSheet = {
   },
   textFieldRegister: {
     width: "100%"
+  },
+  progress: {
+    width: "25px!important",
+    height: "25px!important",
+    position: "absolute",
+    right: "20px",
+    top: "15px"
   }
 }
 
@@ -96,8 +104,13 @@ class AuthenticateView extends Component {
     this.setState(this.state);
   }
 
-  handleChangeInput = prop => event => {
-    this.setState({ [prop]: event.target.value });
+  handleChangeInput(prop, event) {
+    if(prop == "emailLogin" || prop == "emailRegister") { 
+      this.state[prop] = event.target.value.toLowerCase();
+    } else { 
+      this.state[prop] = event.target.value;
+    }
+    this.setState(this.state);
   };
 
   handleModalClose = () => {
@@ -120,6 +133,8 @@ class AuthenticateView extends Component {
       email: this.state.emailLogin,
       password: this.state.passwordLogin
     }
+    this.state.loading = true;
+    this.setState(this.state);
 
     AuthenticateApiService.requestLogin(prepareObj).then((result)=>{
       let user = {
@@ -141,19 +156,26 @@ class AuthenticateView extends Component {
           this.props.history.replace('/');
         }else{
           this.state.openModal = true;
+          this.state.loading = false;
           this.setState(this.state);
         }
       }).catch((err)=>{
         console.log("Erro: ", err);
+        this.state.errorLogin = true;
+        this.state.loading = false;
+        this.setState(this.state);
       });
     }).catch((err)=>{
       console.log("Erro: ", err);
       this.state.errorLogin = true;
+      this.state.loading = false;
       this.setState(this.state);
     });
   }
 
   requestRegister(){
+    this.state.loading = true;
+    this.setState(this.state);
     if(this.state.nameRegister == ""){
       this.state.errorRegister = true;
       this.state.registerErrorMessage = "Erro ao registrar - Nome obrigatório!"
@@ -186,11 +208,13 @@ class AuthenticateView extends Component {
         this.props.history.push('/petRegister');
       }).catch((err)=>{
         console.log("Erro: ", err);
+        this.state.loading = false;
         this.state.errorRegister = true;
         this.setState(this.state);
       });
     } else {
       this.state.errorRegister = true;
+      this.state.loading = false;
       this.state.registerErrorMessage = "Erro ao registrar - Senhas diferentes!"
       this.setState(this.state);
     }
@@ -201,7 +225,12 @@ class AuthenticateView extends Component {
     return(
       <div className={classes.backgroundLogo}>
         {this.state.sign ? 
-        <Paper className={classes.loginPaper}>
+        <Paper className={classes.loginPaper} size={10}>
+          {this.state.loading ? 
+            <CircularProgress className={classes.progress} />
+          :
+            null
+          }
           <div style={{margin: "12px 0px 12px 0px"}}>
             <Typography variant="h6" gutterBottom style={{textAlign: "center"}}>
               Entrar | Pet Safe Care
@@ -209,11 +238,11 @@ class AuthenticateView extends Component {
           </div>
           <div className={classes.inputDesign}>
             <AccountCircle className={classes.iconDesign}/>
-            <TextField label="E-mail" className={classes.textFieldDesign} onChange={this.handleChangeInput('emailLogin')}/>
+            <TextField label="E-mail" value={this.state.emailLogin} className={classes.textFieldDesign} onChange={(event)=>this.handleChangeInput('emailLogin', event)}/>
           </div>
           <div className={classes.inputDesign}>
             <Lock className={classes.iconDesign}/>
-            <TextField label="Senha" className={classes.textFieldDesign} type={'password'} onChange={this.handleChangeInput('passwordLogin')}/>
+            <TextField label="Senha" value={this.state.passwordLogin} className={classes.textFieldDesign} type={'password'} onChange={(event)=>this.handleChangeInput('passwordLogin', event)}/>
           </div>
           {this.state.errorLogin ? 
             <div>
@@ -238,22 +267,27 @@ class AuthenticateView extends Component {
         </Paper>
         :
         <Paper className={classes.registerPaper}>
+          {this.state.loading ? 
+            <CircularProgress className={classes.progress} />
+          :
+            null
+          }
           <div style={{margin: "12px 0px 12px 0px"}}>
             <Typography variant="h6" gutterBottom style={{textAlign: "center"}}>
               Registrar | Pet Safe Care
             </Typography>
           </div>
           <div className={classes.inputDesign}>
-            <TextField label="Nome" className={classes.textFieldRegister} onChange={this.handleChangeInput('nameRegister')}/>
+            <TextField label="Nome" value={this.state.nameRegister} className={classes.textFieldRegister} onChange={(event)=>this.handleChangeInput('nameRegister', event)}/>
           </div>
           <div className={classes.inputDesign}>
-            <TextField label="E-mail" className={classes.textFieldRegister} onChange={this.handleChangeInput('emailRegister')}/>
+            <TextField label="E-mail" value={this.state.emailRegister} className={classes.textFieldRegister} onChange={(event)=>this.handleChangeInput('emailRegister', event)}/>
           </div>
           <div className={classes.inputDesign}>
-            <TextField label="Repita a senha" className={classes.textFieldRegister} type={'password'} onChange={this.handleChangeInput('passwordRegister')}/>
+            <TextField label="Repita a senha" value={this.state.passwordRegister} className={classes.textFieldRegister} type={'password'} onChange={(event)=>this.handleChangeInput('passwordRegister', event)}/>
           </div>
           <div className={classes.inputDesign}>
-            <TextField label="Repita a senha" className={classes.textFieldRegister} type={'password'} onChange={this.handleChangeInput('repeatPasswordRegister')}/>
+            <TextField label="Repita a senha" value={this.state.repeatPasswordRegister} className={classes.textFieldRegister} type={'password'} onChange={(event)=>this.handleChangeInput('repeatPasswordRegister', event)}/>
           </div>
           {this.state.errorRegister ? 
             <div>

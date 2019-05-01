@@ -259,5 +259,24 @@ class AuthenticateApiService {
     });
   }
 
+  requestRatingLocal(userId, localId, obj, jwt) {
+    return new Promise((resolve, reject) =>{
+			fetch(global.API_ENDPOINT + '/local/'+userId+'/rating/'+localId, {
+        method: "POST", 
+				headers: {
+					"Content-Type": "application/json",
+          "Authorization": "Bearer "+ jwt
+				},
+				body: JSON.stringify(obj)
+      }).then((result)=>{
+				result.json().then((result)=>{
+					resolve(result);
+				});
+      }).catch((err)=>{
+        reject(err);
+      });
+    });
+  }
+
 }
 export default new AuthenticateApiService();
