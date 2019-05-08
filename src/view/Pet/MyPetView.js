@@ -33,6 +33,7 @@ import AddIcon from '@material-ui/icons/Add';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 import ApiService from '../../service/ApiService';
+import GPSService from '../../service/GPSService';
 import moment from 'moment';
 
 const styleSheet = {
@@ -107,6 +108,7 @@ class MyPetView extends Component {
       saveDisable: true,
       editDialog: false,
       loading: false,
+      jwt: localStorage.getItem('token')
     }
 
     this.handleEditPetRegisterFn = (event)=>{this.handleEditPetRegister(event.detail)};
@@ -117,6 +119,24 @@ class MyPetView extends Component {
     customEvent('showBar', true);
     customEvent('selectActiveAppBottomBar', 'home');
     this.state.user = JSON.parse(localStorage.getItem('user'));
+    GPSService.initGPS((position)=>{
+      this.state.gps = { 
+        latitude: position.coords.latitude, 
+        longitude: position.coords.longitude
+      };
+      let userObj ={
+        geometry: {
+          coordinates: [this.state.gps.latitude, this.state.gps.longitude]
+        }
+      }
+      localStorage.setItem('GPS', JSON.stringify(this.state.gps));
+      ApiService.requestUpdateUser(this.state.user.id, userObj, this.state.jwt).then((result)=>{
+        this.state.user.geometry = result.user.geometry;
+        localStorage.setItem('user', JSON.stringify(this.state.user));
+      }).catch((err)=>{
+        console.log("Error ", err);
+      });
+    });
     this.state.loading = true;
     this.setState(this.state);
     this.loadHealth();

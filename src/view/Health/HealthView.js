@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUtensils } from '@fortawesome/pro-light-svg-icons'
+import { faUtensils, faDisease } from '@fortawesome/pro-light-svg-icons'
 import { faSyringe } from '@fortawesome/pro-light-svg-icons'
 import { faCapsules } from '@fortawesome/pro-light-svg-icons'
 import { faHandHoldingHeart } from '@fortawesome/pro-light-svg-icons'
@@ -14,6 +14,7 @@ import LunchDialog from './LunchDialog';
 import MedicinesDialog from './MedicinesDialog';
 import VacinesDialog from './VacinesDialog';
 import MeetingsDialog from './MeetingsDialog';
+import DiseasesDialog from './DiseaseDialog';
 
 const styleSheet = {
 }
@@ -75,12 +76,18 @@ class HealthView extends Component {
             </Grid>
           :
             null
-          }       
+          }    
+          <Grid item xs={6}>
+            <Paper onClick={()=>{this.handleClickOpen("diseases")}} className={classes.paper} style={{padding: "40px 0px 40px 0px", backgroundColor: "#8bc34a"}}>
+              <div style={{textAlign: "center", fontSize: "3rem", color: "white"}}><FontAwesomeIcon icon={faDisease} /></div>
+            </Paper>
+          </Grid>   
         </Grid>
 
         <LunchDialog open={this.state.categoryOpen === "lunch" ? true : false} close={()=> this.handleClose()}/>
         <MedicinesDialog open={this.state.categoryOpen === "medicines" ? true : false} close={()=> this.handleClose()}/>
         <VacinesDialog open={this.state.categoryOpen === "vacines" ? true : false} close={()=> this.handleClose()}/>
+        <DiseasesDialog open={this.state.categoryOpen === "diseases" ? true : false} close={()=> this.handleClose()}/>
         {this.state.user.meetings ? 
           <MeetingsDialog open={this.state.categoryOpen === "meetings" ? true : false} close={()=> this.handleClose()}/>
         :

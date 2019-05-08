@@ -22,6 +22,7 @@ import ApiService from '../../service/ApiService';
 
 const styleSheet = {
   registryVacine: {
+    zIndex: "999",
     width: "100%", 
     position: "fixed", 
     marginTop:"64px", 

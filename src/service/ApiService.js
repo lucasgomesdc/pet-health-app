@@ -315,6 +315,5 @@ class AuthenticateApiService {
       });
     });
   }
-
 }
 export default new AuthenticateApiService();
