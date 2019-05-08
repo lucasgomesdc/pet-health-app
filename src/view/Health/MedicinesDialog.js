@@ -78,6 +78,9 @@ class MedicinesDialog extends Component {
       listMedicines: [],
       user: JSON.parse(localStorage.getItem('user')),
       jwt: localStorage.getItem('token'),
+      errorName: false,
+      errorTime: false,
+      errorStart: false
     }
   }
 
@@ -116,29 +119,55 @@ class MedicinesDialog extends Component {
     this.setState({ [prop]: event.target.value });
   };
 
-  saveMedicineRegister() {
-    let medicineObj = {
-      user: this.state.user.id,
-      name: this.state.name,
-      time: this.state.time,
-      start: this.state.start,
-      end: this.state.end,
-      monday: this.state.checkedSeg,
-      tuesday: this.state.checkedTer,
-      wednesday: this.state.checkedQua,
-      thursday: this.state.checkedQui,
-      friday: this.state.checkedSex,
-      saturday: this.state.checkedSab,
-      sunday: this.state.checkedDom
+  validation() {
+    let withoutError = true;
+    if(this.state.name != ""){
+      this.state.errorName = false;
+    } else {
+      this.state.errorName = true;
+      withoutError = false;
     }
+    if(this.state.time != "") { 
+      this.state.errorTime = false;
+    }else {
+      this.state.errorTime = true;
+      withoutError = false;
+    }
+    if(this.state.start != "") { 
+      this.state.errorStart = false;
+    }else {
+      this.state.errorStart = true;
+      withoutError = false;
+    }
+    this.setState(this.state);
+    return(withoutError);
+  }
 
-    ApiService.requestSaveHealth('medicine', medicineObj, this.state.jwt).then((result)=>{
-      this.state.listMedicines.push(result.medicine);
-      this.setState(this.state);
-      this.clearForm();
-    }).catch((err)=>{
-      console.log("Erro: ", err);
-    });
+  saveMedicineRegister() {
+    if(this.validation()) {
+      let medicineObj = {
+        user: this.state.user.id,
+        name: this.state.name,
+        time: this.state.time,
+        start: this.state.start,
+        end: this.state.end,
+        monday: this.state.checkedSeg,
+        tuesday: this.state.checkedTer,
+        wednesday: this.state.checkedQua,
+        thursday: this.state.checkedQui,
+        friday: this.state.checkedSex,
+        saturday: this.state.checkedSab,
+        sunday: this.state.checkedDom
+      }
+  
+      ApiService.requestSaveHealth('medicine', medicineObj, this.state.jwt).then((result)=>{
+        this.state.listMedicines.push(result.medicine);
+        this.setState(this.state);
+        this.clearForm();
+      }).catch((err)=>{
+        console.log("Erro: ", err);
+      });
+    }
   }
 
   clearForm() {
@@ -260,13 +289,13 @@ class MedicinesDialog extends Component {
             </Typography>
             <div style={{padding: "0px 8px"}}>
               <Assignment className={classes.iconDesign} />
-              <TextField label="Nome do Remédio" onChange={this.handleChangeInput('name')} value={this.state.name} style={{width: "calc(60% - 50px)", marginRight: "16px"}} />
+              <TextField error={this.state.errorName && this.state.name == ""} label="Nome do Remédio" onChange={this.handleChangeInput('name')} value={this.state.name} style={{width: "calc(60% - 50px)", marginRight: "16px"}} />
               <Alarm className={classes.iconDesign} />
-              <TextField label="Definir Hora" onChange={this.handleChangeInput('time')} value={this.state.time} type="time" style={{width: "calc(40% - 50px)", marginRight: "16px"}}/>
+              <TextField error={this.state.errorTime && this.state.time == ""} label="Definir Hora" onChange={this.handleChangeInput('time')} value={this.state.time} type="time" style={{width: "calc(40% - 50px)", marginRight: "16px"}}/>
             </div>
             <div style={{padding: "0px 8px"}}>
               <Event className={classes.iconDesign} />
-              <TextField label="Data do Começo" onChange={this.handleChangeInput('start')} type="date" value={this.state.start} style={{width: "calc(50% - 50px)", marginRight: "16px"}} />
+              <TextField error={this.state.errorStart && this.state.start == ""} label="Data do Começo" onChange={this.handleChangeInput('start')} type="date" value={this.state.start} style={{width: "calc(50% - 50px)", marginRight: "16px"}} />
               <Event className={classes.iconDesign} />
               <TextField label="Data do Fim" onChange={this.handleChangeInput('end')} type="date" value={this.state.end} style={{width: "calc(50% - 50px)"}}/>
             </div>

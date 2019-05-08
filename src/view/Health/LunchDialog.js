@@ -70,7 +70,9 @@ class LunchDialog extends Component {
       checkedDom: false,
       user: JSON.parse(localStorage.getItem('user')),
       jwt: localStorage.getItem('token'),
-      listLunches: []
+      listLunches: [],
+      errorName: false,
+      errorTime: false,
     }
   }
 
@@ -109,27 +111,47 @@ class LunchDialog extends Component {
     this.setState({ [prop]: event.target.value });
   };
 
-  saveLunchRegister() {
-    let lunchObj = {
-      user: this.state.user.id,
-      name: this.state.name,
-      time: this.state.time,
-      weight: this.state.weight,
-      monday: this.state.checkedSeg,
-      tuesday: this.state.checkedTer,
-      wednesday: this.state.checkedQua,
-      thursday: this.state.checkedQui,
-      friday: this.state.checkedSex,
-      saturday: this.state.checkedSab,
-      sunday: this.state.checkedDom
+  validation(){
+    let withoutError = true;
+    if(this.state.name != ""){
+      this.state.errorName = false;
+    } else {
+      this.state.errorName = true;
+      withoutError = false;
     }
-    ApiService.requestSaveHealth('lunch', lunchObj, this.state.jwt).then((result)=>{
-      this.state.listLunches.push(result.lunch);
-      this.setState(this.state);
-      this.clearForm();
-    }).catch((err)=>{
-      console.log("Erro: ", err);
-    });
+    if(this.state.time != "") { 
+      this.state.errorTime = false;
+    }else {
+      this.state.errorTime = true;
+      withoutError = false;
+    }
+    this.setState(this.state);
+    return(withoutError);
+  }
+
+  saveLunchRegister() {
+    if(this.validation()){
+      let lunchObj = {
+        user: this.state.user.id,
+        name: this.state.name,
+        time: this.state.time,
+        weight: this.state.weight,
+        monday: this.state.checkedSeg,
+        tuesday: this.state.checkedTer,
+        wednesday: this.state.checkedQua,
+        thursday: this.state.checkedQui,
+        friday: this.state.checkedSex,
+        saturday: this.state.checkedSab,
+        sunday: this.state.checkedDom
+      }
+      ApiService.requestSaveHealth('lunch', lunchObj, this.state.jwt).then((result)=>{
+        this.state.listLunches.push(result.lunch);
+        this.setState(this.state);
+        this.clearForm();
+      }).catch((err)=>{
+        console.log("Erro: ", err);
+      });
+    }
   }
   
   clearForm() {
@@ -242,11 +264,11 @@ class LunchDialog extends Component {
             </Typography>
             <div style={{padding: "0px 8px"}}>
               <Assignment className={classes.iconDesign} />
-              <TextField label="Tipo de Alimento" value={this.state.name} className={classes.inputDesign}  onChange={this.handleChangeInput('name')}/>
+              <TextField error={this.state.errorName && this.state.name == ""} label="Tipo de Alimento" value={this.state.name} className={classes.inputDesign}  onChange={this.handleChangeInput('name')}/>
             </div>
             <div style={{padding: "0px 8px"}}>
               <Alarm className={classes.iconDesign} />
-              <TextField label="Definir Hora" value={this.state.time} type="time" style={{width: "calc(50% - 50px)", marginRight: "16px"}}  onChange={this.handleChangeInput('time')}/>
+              <TextField label="Definir Hora" error={this.state.errorTime && this.state.time == ""} value={this.state.time} type="time" style={{width: "calc(50% - 50px)", marginRight: "16px"}}  onChange={this.handleChangeInput('time')}/>
               <FontAwesomeIcon icon={faWeight} style={{margin: "20px 8px 4px 0px", fontSize: "22px"}}/>
               <TextField label="Peso (grama)" value={this.state.weight} type="number" style={{width: "calc(50% - 50px)"}}  onChange={this.handleChangeInput('weight')}/>
             </div>

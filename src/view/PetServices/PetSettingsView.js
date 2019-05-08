@@ -168,18 +168,29 @@ class PetSettingsView extends Component {
           </Grid>
         </Grid>
         {this.state.changed ? 
-          <div style={{textAlign: "center", marginTop: "35px"}}>
-            <Button onClick={()=>{this.saveSettings()}} variant="contained" style={{backgroundColor: "#4caf50", color: "white"}} >
-              Salvar
+          <div style={{marginTop: "35px", padding: "0px 10px"}}>
+            <Button onClick={()=>{this.saveSettings()}} color="primary" >
+              Salvar Configuração
             </Button>
           </div>
         :
           null
         }
-        <div style={{textAlign: "center", marginTop: "35px"}}>
-          <Button onClick={()=>{this.logoff()}} variant="contained" color="secondary" >
+        <div style={{marginTop: "18px"}}>
+          <Button onClick={()=>{this.logoff()}} color="primary" >
             Sair
           </Button>
+        </div>
+        <div>
+          <Typography style={{
+            padding: "0px 10px",
+            textAlign: "justify",
+            position: "absolute",
+            bottom: "100px"
+          }}>
+            Aplicativo desenvolvido como fim educacional em um Trabalho de Conclusão de Curso do aluno Lucas Eduardo Gomes orientado por Felipe Domingos da Cunha na 
+  Pontifícia Universidade Católica de Minas Gerais
+          </Typography>
         </div>
       </div>
     );

@@ -25,10 +25,12 @@ import { faWeight } from '@fortawesome/pro-solid-svg-icons';
 import { faCat } from '@fortawesome/pro-solid-svg-icons';
 import { faDog } from '@fortawesome/pro-solid-svg-icons';
 import { faCheck } from '@fortawesome/pro-solid-svg-icons';
+import moment from 'moment';
 
 import CameraService from '../../service/CameraService';
 import UploadImageService from '../../service/UploadImageService';
 import ApiService from '../../service/ApiService';
+import { customEvent } from '../../library';
 
 const animalType = [
   {
@@ -92,15 +94,36 @@ class PetRegister extends Component {
       pedigree: "nao",
       anchorEl: null,
       animalBreedList: [],
-      foundError: false
+      foundError: false,
+      userId: null
     }
     this.breedList = null
   }
 
   componentDidMount() {
+    customEvent('showBar', false);
     ApiService.requestBreedList(localStorage.getItem('token')).then((result)=>{
       this.breedList = result;
       this.filterBreed();
+
+      if(this.props.location.state.pet) { 
+        let pet = this.props.location.state.pet;
+        this.state = {
+          media: pet.media,
+          type: pet.breed.species,
+          breed: pet.breed._id,
+          name: pet.name,
+          microchip: pet.microchip,
+          born: moment.utc(pet.born).format('YYYY-MM-DD'),
+          weight: pet.weight,
+          gender: pet.gender,
+          pedigree: pet.pedigree ? "sim" : "nao",
+          castrated: pet.castrated ? "sim" : "nao",
+          edit: true,
+          userId: pet.user._id,
+        }
+        this.setState(this.state)
+      }
     }).catch((err)=>{
       console.log("Erro", err);
     })
@@ -195,6 +218,7 @@ class PetRegister extends Component {
   saveRegisterPet() {
     this.validateData();
 
+
     if(this.state.foundError == false){
       let petObj = {
         name: this.state.name,
@@ -210,11 +234,20 @@ class PetRegister extends Component {
       }
 
       const jwt = localStorage.getItem("token");
-      ApiService.requestSavePet(petObj, jwt).then((data)=>{
-        this.props.history.push('/');
-      }).catch((err)=>{
-        console.log("Erro", err);
-      });
+      if(this.state.edit) {
+        ApiService.requestEditPet(this.state.userId, petObj, jwt).then((data)=>{
+          localStorage.setItem('pet', null);
+          this.props.history.replace('/');
+        }).catch((err)=>{
+          console.log("Erro", err);
+        });
+      } else {
+        ApiService.requestSavePet(petObj, jwt).then((data)=>{
+          this.props.history.replace('/');
+        }).catch((err)=>{
+          console.log("Erro", err);
+        });
+      }
     }
   }
 
@@ -229,6 +262,7 @@ class PetRegister extends Component {
 
   deleteImage() { 
     this.state.imageRaw = "";
+    this.state.media = "";
     this.setState(this.state);
   }
 
@@ -239,13 +273,13 @@ class PetRegister extends Component {
         <AppBar position="static">
           <Toolbar>
             <Typography className={classes.title} variant="h6" color="inherit" noWrap>
-              Cadastrar Pet
+              {this.state.edit ? "Editar Cadastro do Pet" : "Cadastrar Pet"}
             </Typography>
           </Toolbar>
         </AppBar>
         <div style={{padding: "16px"}}>
           <div>
-            {this.state.imageRaw == "" ? 
+            {this.state.imageRaw == "" && this.state.media == "" ? 
               <Avatar
                 alt="Pet Picture"
                 src=""
@@ -273,7 +307,7 @@ class PetRegister extends Component {
             <div className={classes.avatarWithImage}>
               <Avatar 
                 alt="Teste" 
-                src={this.state.imageRaw} 
+                src={this.state.media ? this.state.media : this.state.imageRaw} 
                 className={classes.image} 
               />
               <Fab onClick={()=>{this.deleteImage()}}size="small" color="secondary" aria-label="Remove" className={classes.cameraButton}>

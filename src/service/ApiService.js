@@ -54,6 +54,25 @@ class AuthenticateApiService {
 		});
   }
 
+  requestEditPet(id, pet, jwt) { 
+    return new Promise((resolve, reject) =>{
+      fetch(global.API_ENDPOINT + '/pet/'+id, {
+				method: "PUT", 
+				headers: {
+					"Content-Type": "application/json",
+          "Authorization": "Bearer "+ jwt
+				},
+				body: JSON.stringify(pet)
+			}).then((result)=>{
+				result.json().then((result)=>{
+					resolve(result);
+				});
+			}).catch((err)=>{
+				reject(err);
+			});
+    });
+  }
+
   requestRegisterMeetings(obj, jwt) { 
     return new Promise((resolve, reject) =>{
 			fetch(global.API_ENDPOINT + '/meetings/new', {
@@ -262,6 +281,25 @@ class AuthenticateApiService {
   requestRatingLocal(userId, localId, obj, jwt) {
     return new Promise((resolve, reject) =>{
 			fetch(global.API_ENDPOINT + '/local/'+userId+'/rating/'+localId, {
+        method: "POST", 
+				headers: {
+					"Content-Type": "application/json",
+          "Authorization": "Bearer "+ jwt
+				},
+				body: JSON.stringify(obj)
+      }).then((result)=>{
+				result.json().then((result)=>{
+					resolve(result);
+				});
+      }).catch((err)=>{
+        reject(err);
+      });
+    });
+  }
+
+  requestSuggestionLocal(obj, jwt){
+    return new Promise((resolve, reject) =>{
+			fetch(global.API_ENDPOINT + '/local/suggestion/', {
         method: "POST", 
 				headers: {
 					"Content-Type": "application/json",

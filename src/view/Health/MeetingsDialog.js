@@ -10,7 +10,8 @@ import Slide from '@material-ui/core/Slide';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMapMarkerAlt } from '@fortawesome/pro-solid-svg-icons';
+import { faMapMarkerAlt, faMars, faVenus, faChartNetwork } from '@fortawesome/pro-solid-svg-icons';
+import { faEnvelope } from '@fortawesome/pro-regular-svg-icons';
 import { faInstagram } from '@fortawesome/free-brands-svg-icons';
 import { customEvent } from '../../library';
 import ApiService from '../../service/ApiService';
@@ -31,6 +32,7 @@ class MeetingsDialog extends Component {
       gps: [],
       meetingList: [],
       meeting: JSON.parse(localStorage.getItem('meeting')),
+      pet: JSON.parse(localStorage.getItem('pet')),
       jwt: localStorage.getItem('token')
     }
   }
@@ -65,6 +67,14 @@ class MeetingsDialog extends Component {
       });
     });
   }
+  
+  openInstagram(instagramProfile) {
+    window.open("https://www.instagram.com/"+instagramProfile)
+  }
+
+  openEmail(email) {
+    window.open("mailto:"+email);
+  }
 
   render(){
     const { classes } = this.props;
@@ -84,24 +94,53 @@ class MeetingsDialog extends Component {
           <div style={{width: "60%", padding: "12px"}}>
             <div style={{fontSize: "30px"}}>
               {meeting.pet.name}
+              <Typography>
+                {"("+meeting.breed.name+")"}
+              </Typography>
             </div>
             <div style={{marginTop: "12px"}}>
               <FontAwesomeIcon icon={ faMapMarkerAlt } style={{color: "rgba(0, 0, 0, 0.54)", marginRight: '8px'}}/>
-              {distanceInKm+' '}km
+              {distanceInKm < 1 ? "menos de 1"+' ' : distanceInKm+' '}km
+              {meeting.pet.gender == "femea" ? 
+              <FontAwesomeIcon icon={ faVenus } style={{color: "rgba(0, 0, 0, 0.54)", marginLeft: '12px', fontSize: "18px"}}/>
+              :
+              <FontAwesomeIcon icon={ faMars } style={{color: "rgba(0, 0, 0, 0.54)", marginLeft: '12px', fontSize: "18px"}}/>
+              }
+              {meeting.pet.pedigree ? 
+              <FontAwesomeIcon icon={ faChartNetwork } style={{color: "rgba(0, 0, 0, 0.54)", marginLeft: '12px', fontSize: "18px"}}/>
+              :
+              null
+              }
             </div>
           </div>
           <div style={{width: "15%", position: "relative"}}>
-            <IconButton 
-              className={classes.button}
-              aria-label="contact"
-              style={{
-                position:"absolute",
-                top: "calc(50% - 30px)",
-                fontSize: "30px"
-              }}
-            >
-              <FontAwesomeIcon icon={ faInstagram } style={{color: "rgba(0, 0, 0, 0.54)"}}/>
-            </IconButton>
+            {meeting.user.instagram ?  
+              <IconButton 
+                onClick={()=>{this.openInstagram(meeting.user.instagram)}}
+                className={classes.button}
+                aria-label="contact"
+                style={{
+                  position:"absolute",
+                  top: "calc(50% - 30px)",
+                  fontSize: "30px"
+                }}
+              >
+                <FontAwesomeIcon icon={ faInstagram } style={{color: "rgba(0, 0, 0, 0.54)"}}/>
+              </IconButton>
+            : 
+              <IconButton 
+                onClick={()=>{this.openEmail(meeting.user.email)}}
+                className={classes.button}
+                aria-label="contact"
+                style={{
+                  position:"absolute",
+                  top: "calc(50% - 30px)",
+                  fontSize: "30px"
+                }}
+              >
+                <FontAwesomeIcon icon={ faEnvelope } style={{color: "rgba(0, 0, 0, 0.54)"}}/>
+              </IconButton>
+            }
           </div>
         </div>
       );

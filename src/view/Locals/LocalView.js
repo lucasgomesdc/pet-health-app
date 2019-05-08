@@ -22,6 +22,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faThumbsUp as likeSolid, faThumbsDown as dislikeSolid } from '@fortawesome/pro-solid-svg-icons';
 import { faShieldCheck, faMapMarked } from '@fortawesome/pro-regular-svg-icons';
 import { faThumbsUp as likeLight, faThumbsDown as dislikeLight, faCommentAltSmile } from '@fortawesome/pro-light-svg-icons';
+import Paper from '@material-ui/core/Paper';
 
 import { customEvent } from '../../library';
 import ApiService from '../../service/ApiService';
@@ -201,6 +202,12 @@ class LocalView extends Component {
       console.log("Error: ", err);
     });
   }
+
+  openMaps(coordinates) {
+    if(coordinates && coordinates.length > 0) {
+      window.open("geo:0,0?q="+ coordinates[0] + ","+coordinates[1]);
+    }
+  }
   
   render(){
     const { classes } = this.props;
@@ -241,7 +248,7 @@ class LocalView extends Component {
             <Typography>
               {local.safety}%
             </Typography>
-            <IconButton className={classes.button} aria-label="map">
+            <IconButton onClick={()=>{this.openMaps(local.geometry.coordinates)}} className={classes.button} aria-label="map">
               <FontAwesomeIcon icon={ faMapMarked } className={classes.svgIcon}/>
             </IconButton>
           </CardActions>
@@ -259,7 +266,20 @@ class LocalView extends Component {
           </Typography>
         </div>
         :
-        locals
+        <div>
+          <Paper style={{
+            margin: "11px",
+            padding: "12px"
+          }}>
+            <Typography variant="h5" gutterBottom>
+              Locais Pet Friendly 
+            </Typography>
+            <Typography>
+              Seu animal é bem-vindo :)
+            </Typography>
+          </Paper>
+          {locals}
+        </div>
         }
         <div style={{height: "50px"}}>
         </div>

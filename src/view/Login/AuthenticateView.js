@@ -215,7 +215,7 @@ class AuthenticateView extends Component {
     } else {
       this.state.errorRegister = true;
       this.state.loading = false;
-      this.state.registerErrorMessage = "Erro ao registrar - Senhas diferentes!"
+      this.state.registerErrorMessage = "Erro ao registrar - Senhas diferentes!";
       this.setState(this.state);
     }
   }

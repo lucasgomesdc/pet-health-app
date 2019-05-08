@@ -14,13 +14,14 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography'
 import Fab from '@material-ui/core/Fab';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMars, faChartNetwork, faVenus, faWeight, faUserMd, faFlagCheckered } from '@fortawesome/pro-solid-svg-icons';
+import { faMars, faChartNetwork, faVenus, faWeight, faUserMd, faFlagCheckered, faCalendarDay } from '@fortawesome/pro-solid-svg-icons';
 import { customEvent } from '../../library';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from '@material-ui/core/Grid';
-import DeleteIcon from '@material-ui/icons/Delete';
+import DateRange from '@material-ui/icons/DateRange';
+import Edit from '@material-ui/icons/Edit';
 import Input from '@material-ui/core/Input';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -28,6 +29,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
+import AddIcon from '@material-ui/icons/Add';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import ApiService from '../../service/ApiService';
 import moment from 'moment';
@@ -50,6 +53,11 @@ const styleSheet = {
     display: "inline-block",
     width: "80px",
     height: "50px"
+  },
+  button: {
+    "&:hover": {
+      backgroundColor: "transparent"
+    }
   }
 }
 
@@ -96,29 +104,51 @@ class MyPetView extends Component {
       listVacines: [],
       openDialogPhone: false,
       numberPhone: '(  )    -    ',
-      saveDisable: true
+      saveDisable: true,
+      editDialog: false,
+      loading: false,
     }
+
+    this.handleEditPetRegisterFn = (event)=>{this.handleEditPetRegister(event.detail)};
+    window.addEventListener('handleEditPetRegister', this.handleEditPetRegisterFn);
   }
 
   componentDidMount() {
     customEvent('showBar', true);
     customEvent('selectActiveAppBottomBar', 'home');
     this.state.user = JSON.parse(localStorage.getItem('user'));
+    this.state.loading = true;
+    this.setState(this.state);
     this.loadHealth();
     let petInfo = JSON.parse(localStorage.getItem('pet'));
     if(petInfo != null){
       this.initStates(petInfo);
+      customEvent('handleOpenEditIcon', true);
     } else {
       ApiService.requestPet(this.state.user.id, localStorage.getItem('token')).then((data)=>{
         localStorage.setItem('pet', JSON.stringify(data));
         if(data){
           this.initStates(data);
+          customEvent('handleOpenEditIcon', true);
         }
       }).catch((err)=>{
         console.log("Error ", err);
       });
     }
+  }
 
+  componentWillUnmount() {
+    customEvent('handleOpenEditIcon', false);
+  }
+
+  handleEditPetRegister() {
+    let pet = JSON.parse(localStorage.getItem('pet'));
+    this.props.history.push({
+      pathname: '/petRegister',
+      state: {
+        pet: pet
+      }
+    });
   }
 
   initStates(petInfo){
@@ -182,15 +212,22 @@ class MyPetView extends Component {
                 }
               }
             });
+            this.state.loading = false;
             this.setState(this.state);
           }).catch((err)=>{
             console.log("Error: ", err);
+            this.state.loading = false;
+            this.setState(this.state);
           });
         }).catch((err)=>{
           console.log("Error: ", err);
+          this.state.loading = false;
+          this.setState(this.state);
         });
       }).catch((err)=>{
         console.log("Error: ", err);
+        this.state.loading = false;
+        this.setState(this.state);
       });
     }
   }
@@ -205,8 +242,16 @@ class MyPetView extends Component {
     this.props.history.push('/health');
   }
 
-  handleDialogPhoneClickOpen = () => {
-    this.setState({ openDialogPhone: true });
+  handleDialogPhoneClickOpen(value){
+    this.state.openDialogPhone = true;
+    if(value) {
+      this.state.editDialog = true;
+      this.state.numberPhone = this.state.user.contactEmergency;
+    } else {
+      this.state.numberPhone = '(  )    -    ';
+      this.state.editDialog = false;
+    }
+    this.setState(this.state);
   };
 
   handleDialogPhoneClose = () => {
@@ -253,8 +298,23 @@ class MyPetView extends Component {
     this.handleDialogPhoneClose();
   }
 
+  removeNumber() {
+    let userObj = { 
+      contactEmergency: ""
+    }
+    ApiService.requestUpdateUser(this.state.user.id, userObj, this.state.jwt).then((result)=>{
+      this.state.user.contactEmergency = result.user.contactEmergency;
+      this.setState(this.state);
+      localStorage.setItem('user', JSON.stringify(this.state.user));
+    }).catch((err)=>{
+      console.log("Erro: ", err);
+    });
+    this.handleDialogPhoneClose();
+  }
+
   render() {
     const { classes } = this.props;
+    let phoneRegistered = false;
 
     let medicines = this.state.listMedicines.map((medicine, index)=>{
       let dataEnd;
@@ -283,6 +343,7 @@ class MyPetView extends Component {
                     :
                       null
                     }
+                    <FontAwesomeIcon icon={faCalendarDay} style={{marginLeft: "20px", marginRight: "10px"}}/>
                     <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.sunday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)" }}>
                       D
                     </div>
@@ -307,9 +368,6 @@ class MyPetView extends Component {
                 </Typography>
               </Grid>
               <Grid item xs={2} style={{textAlign: "right"}}>
-                <IconButton onClick={()=>{this.deleteMedicine(medicine._id)}} aria-label="Delete" className={classes.margin}>
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
               </Grid>
             </Grid>
           </Paper>
@@ -336,7 +394,8 @@ class MyPetView extends Component {
                   <div style={{display: "inline-block", padding: "0px 6px 0px 6px"}}>
                   {lunch.weight}g
                   </div>
-                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.sunday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)" }}>
+                  <FontAwesomeIcon icon={faCalendarDay} style={{marginLeft: "20px", marginRight: "10px"}}/>
+                  <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.sunday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
                     D
                   </div>
                   <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.monday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)"}}>
@@ -360,9 +419,6 @@ class MyPetView extends Component {
               </Typography>
             </Grid>
             <Grid item xs={2} style={{textAlign: "right"}}>
-              <IconButton onClick={()=>{this.deleteLunch(lunch._id)}} aria-label="Delete" className={classes.margin}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
             </Grid>
           </Grid>
         </Paper>
@@ -401,9 +457,6 @@ class MyPetView extends Component {
                 </Typography>
               </Grid>
               <Grid item xs={2} style={{textAlign: "right"}}>
-                <IconButton onClick={()=>{this.deleteVacine(vacine._id)}} aria-label="Delete" className={classes.margin}>
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
               </Grid>
             </Grid>
           </Paper>
@@ -489,38 +542,82 @@ class MyPetView extends Component {
             </IconButton>
           </div>
         </Paper>
-        <div style={{padding: "20px", textAlign: "center"}}>
-          <Fab
-            onClick={()=>{this.callEmergency('31663836')}}
-            variant="extended"
-            size="medium"
-            style={{backgroundColor: "#4caf50", color: "white", width: "188px"}}
-            aria-label="Add"
-            className={classes.margin}
-          >
-            <Call />
-            Emergência
-          </Fab>
-        </div>
-        {lunches.length == 0 && medicines.length == 0 && vacines.length == 0 ?
-        <div style={{height: "250px", width: "100%", position: "relative"}}>
-            <div style={{  position: "absolute" , top: "125px", right: 0, left: 0, margin: "auto", textAlign: "center"}}>
-              Não encontrei nenhum registro de saúde
-              <div>
-                <Button onClick={()=>{this.healthScreen()}} color="primary" className={classes.button}>
-                  Adicionar
-                </Button>
-              </div>
+        <Paper style={{margin: "8px 0px", height: "64px", position: "relative"}}>
+          <Typography variant="h5" gutterBottom style={{position: "absolute", left: "8px", top: "19px", fontSize:"18px"}}>
+            Número de Emergência
+          </Typography>
+          {this.state.user.contactEmergency ? 
+            <Fab
+              onClick={()=>{this.callEmergency()}}
+              variant="extended"
+              size="medium"
+              style={{backgroundColor: "#4caf50", color: "white", position: "absolute", right: "8px", top: "10px"}}
+              aria-label="Call"
+              className={classes.margin}
+            >
+              <Call />
+              Chamar
+            </Fab>
+          :
+            null
+          }
+          {this.state.user.contactEmergency ? 
+            <Fab
+              onClick={()=>{this.handleDialogPhoneClickOpen(true)}}
+              size="small"
+              style={{backgroundColor: "#2196f3", color: "white", position: "absolute", right: "136px", top: "10px"}}
+              aria-label="Edit"
+              className={classes.margin}
+            >
+              <Edit />
+            </Fab>
+          :
+            null
+          }
+          {this.state.user.contactEmergency == "" || this.state.user.contactEmergency == null? 
+            <Fab
+              onClick={()=>{this.handleDialogPhoneClickOpen(false)}}
+              variant="extended"
+              size="medium"
+              style={{backgroundColor: "#2196f3", color: "white", position: "absolute", right: "12px", top: "10px"}}
+              aria-label="Add Phone"
+              className={classes.margin}
+            >
+              <AddIcon />
+              Adicionar
+            </Fab>
+          :
+            null
+          }
+
+        </Paper>
+        {this.state.loading ? 
+          <div style={{width: "100%", textAlign: "center", padding: "100px 0px"}}>
+            <CircularProgress className={classes.progress} />
+            <Typography style={{width: "100%", textAlign: "center", marginTop: "16px"}}>
+              Carregando registros de saúde ...
+            </Typography>
+          </div>
+        : 
+          lunches.length == 0 && medicines.length == 0 && vacines.length == 0 ?
+            <div style={{height: "250px", width: "100%", position: "relative"}}>
+                <div style={{  position: "absolute" , top: "125px", right: 0, left: 0, margin: "auto", textAlign: "center"}}>
+                  Não encontrei nenhum registro de saúde
+                  <div>
+                    <Button onClick={()=>{this.healthScreen()}} color="primary">
+                      Adicionar
+                    </Button>
+                  </div>
+                </div>
             </div>
-        </div>
-        :
-        <div>
-          <Grid container>
-            {lunches}
-            {medicines}
-            {vacines}
-          </Grid>
-        </div>
+          :
+            <div>
+              <Grid container>
+                {lunches}
+                {medicines}
+                {vacines}
+              </Grid>
+            </div>
         }
         <Dialog
           open={this.state.openDialogPhone}
@@ -543,6 +640,7 @@ class MyPetView extends Component {
                 onChange={(evt)=>{this.handleChangeNumberPhone(evt)}}
                 id="formatted-text-mask-input"
                 inputComponent={TextMaskCustom}
+                style={{fontSize: "22px"}}
               />
             </div>
           </DialogContent>
@@ -550,7 +648,14 @@ class MyPetView extends Component {
             <Button onClick={this.handleDialogPhoneClose} color="primary">
               Cancelar
             </Button>
-            <Button onClick={()=>{this.saveNumber()}} color="primary" disabled={this.state.saveDisable}>
+            {this.state.editDialog ?
+              <Button onClick={()=>{this.removeNumber()}} color="primary" disabled={this.state.editDialog ? false : this.state.saveDisable}>
+                Remover
+              </Button>
+            :
+              null
+            }
+            <Button onClick={()=>{this.saveNumber()}} color="primary" disabled={this.state.editDialog ? false : this.state.saveDisable}>
               Salvar
             </Button>
           </DialogActions>

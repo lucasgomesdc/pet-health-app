@@ -75,25 +75,54 @@ class VacinesDialog extends Component {
       apply: "",
       reapply: "",
       applyBy: "",
+      errorName: false,
+      errorApply: false,
+      errorApplyBy: false
     }
     this.setState(this.state);
   }
 
-  saveVacine() {
-    let vacineObj = {
-      user: this.state.user.id,
-      name: this.state.name,
-      apply: this.state.apply,
-      reapply: this.state.reapply,
-      applyBy: this.state.applyBy
+  validation() {
+    let withoutError = true;
+    if(this.state.name != "") {
+      this.state.errorName = false;
+    } else { 
+      this.state.errorName = true;
+      withoutError = false;
     }
-    ApiService.requestSaveHealth('vacine', vacineObj, this.state.jwt).then((result)=>{
-      this.state.listVacines.push(result.vacine);
-      this.setState(this.state);
-      this.clearForm();
-    }).catch((err)=>{
-      console.log("Erro: ", err);
-    });
+    if(this.state.apply != "") {
+      this.state.errorApply = false;
+    } else { 
+      this.state.errorApply = true;
+      withoutError = false;
+    }
+    if(this.state.applyBy != "") {
+      this.state.errorApplyBy = false;
+    } else { 
+      this.state.errorApplyBy = true;
+      withoutError = false;
+    }
+    this.setState(this.state);
+    return(withoutError);
+  }
+
+  saveVacine() {
+    if(this.validation()) {
+      let vacineObj = {
+        user: this.state.user.id,
+        name: this.state.name,
+        apply: this.state.apply,
+        reapply: this.state.reapply,
+        applyBy: this.state.applyBy
+      }
+      ApiService.requestSaveHealth('vacine', vacineObj, this.state.jwt).then((result)=>{
+        this.state.listVacines.push(result.vacine);
+        this.setState(this.state);
+        this.clearForm();
+      }).catch((err)=>{
+        console.log("Erro: ", err);
+      });
+    }
   }
 
   deleteVacine(id) {
@@ -173,21 +202,21 @@ class VacinesDialog extends Component {
           </AppBar>
           <div id="registryVacine" className={classes.registryVacine}>
             <Typography variant="title" gutterBottom style={{marginTop: "8px", textAlign: "center"}}>
-              Novo Registro de Vacine
+              Novo Registro de Vacina
             </Typography>
             <div style={{padding: "0px 8px"}}>
               <Assignment className={classes.iconDesign} />
-              <TextField label="Nome da Vacina" onChange={this.handleChangeInput('name')}value={this.state.name} className={classes.inputDesign} />
+              <TextField error={this.state.errorName && this.state.name == ""} label="Nome da Vacina" onChange={this.handleChangeInput('name')}value={this.state.name} className={classes.inputDesign} />
             </div>
             <div style={{padding: "0px 8px"}}>
               <Event className={classes.iconDesign} />
-              <TextField label="Data Aplicação" onChange={this.handleChangeInput('apply')} type="date" value={this.state.apply} style={{width: "calc(50% - 50px)", marginRight: "16px"}} />
+              <TextField error={this.state.errorApply && this.state.apply == ""} label="Data Aplicação" onChange={this.handleChangeInput('apply')} type="date" value={this.state.apply} style={{width: "calc(50% - 50px)", marginRight: "16px"}} />
               <Event className={classes.iconDesign} />
               <TextField label="Data Reaplicação" onChange={this.handleChangeInput('reapply')} type="date" value={this.state.reapply} style={{width: "calc(50% - 50px)"}}/>
             </div>   
             <div style={{padding: "0px 8px"}}>
               <FontAwesomeIcon icon={faUserMd} className={classes.iconDesign} style={{fontSize: "24px"}}/>
-              <TextField label="Nome do Aplicador" onChange={this.handleChangeInput('applyBy')}value={this.state.applyBy} className={classes.inputDesign} />
+              <TextField error={this.state.errorApplyBy && this.state.applyBy == ""} label="Nome do Aplicador" onChange={this.handleChangeInput('applyBy')}value={this.state.applyBy} className={classes.inputDesign} />
             </div>
             <div style={{textAlign: "center", marginTop: "16px"}}>
               <Button onClick={()=>{this.saveVacine()}}variant="outlined" color="primary" style={{fontWeight: "bold", margin: "0px 6px 0px 6px"}}>
