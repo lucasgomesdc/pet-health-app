@@ -14,7 +14,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography'
 import Fab from '@material-ui/core/Fab';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMars, faChartNetwork, faVenus, faWeight, faUserMd, faFlagCheckered, faCalendarDay } from '@fortawesome/pro-solid-svg-icons';
+import { faMars, faChartNetwork, faVenus, faWeight, faUserMd, faFlagCheckered, faCalendarDay, faDog, faIdCard, faUserAstronaut, faStars, faCat } from '@fortawesome/pro-solid-svg-icons';
 import { customEvent } from '../../library';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ExpandLess from '@material-ui/icons/ExpandLess';
@@ -98,6 +98,7 @@ class MyPetView extends Component {
       pedigree: null,
       castrated: null,
       user: "",
+      species: "",
       showDetails: false,
       jwt: localStorage.getItem('token'),
       listLunches: [],
@@ -108,6 +109,7 @@ class MyPetView extends Component {
       saveDisable: true,
       editDialog: false,
       loading: false,
+      user: JSON.parse(localStorage.getItem('user')),
       jwt: localStorage.getItem('token')
     }
 
@@ -118,42 +120,48 @@ class MyPetView extends Component {
   componentDidMount() {
     customEvent('showBar', true);
     customEvent('selectActiveAppBottomBar', 'home');
-    this.state.user = JSON.parse(localStorage.getItem('user'));
-    GPSService.initGPS((position)=>{
-      this.state.gps = { 
-        latitude: position.coords.latitude, 
-        longitude: position.coords.longitude
-      };
-      let userObj ={
-        geometry: {
-          coordinates: [this.state.gps.latitude, this.state.gps.longitude]
+    if(this.state && this.state.user.id) {
+      GPSService.initGPS((position)=>{
+        this.state.gps = { 
+          latitude: position.coords.latitude, 
+          longitude: position.coords.longitude
+        };
+        let userObj ={
+          geometry: {
+            coordinates: [this.state.gps.latitude, this.state.gps.longitude]
+          }
         }
+        localStorage.setItem('GPS', JSON.stringify(this.state.gps));
+        ApiService.requestUpdateUser(this.state.user.id, userObj, this.state.jwt).then((result)=>{
+          this.state.user.geometry = result.user.geometry;
+          localStorage.setItem('user', JSON.stringify(this.state.user));
+        }).catch((err)=>{
+          console.log("Error ", err);
+        });
+      });
+      this.state.loading = true;
+      this.setState(this.state);
+      this.loadHealth();
+      let petInfo = JSON.parse(localStorage.getItem('pet'));
+      if(petInfo != null){
+        this.initStates(petInfo);
+        customEvent('handleOpenEditIcon', true);
+      } else {
+        ApiService.requestPet(this.state.user.id, localStorage.getItem('token')).then((data)=>{
+          if(data) {
+            localStorage.setItem('pet', JSON.stringify(data));
+            if(data){
+              this.initStates(data);
+              customEvent('handleOpenEditIcon', true);
+            }
+          } else {
+            localStorage.setItem('token', null);
+            this.props.history.replace('/auth');
+          }
+        }).catch((err)=>{
+          console.log("Error ", err);
+        });
       }
-      localStorage.setItem('GPS', JSON.stringify(this.state.gps));
-      ApiService.requestUpdateUser(this.state.user.id, userObj, this.state.jwt).then((result)=>{
-        this.state.user.geometry = result.user.geometry;
-        localStorage.setItem('user', JSON.stringify(this.state.user));
-      }).catch((err)=>{
-        console.log("Error ", err);
-      });
-    });
-    this.state.loading = true;
-    this.setState(this.state);
-    this.loadHealth();
-    let petInfo = JSON.parse(localStorage.getItem('pet'));
-    if(petInfo != null){
-      this.initStates(petInfo);
-      customEvent('handleOpenEditIcon', true);
-    } else {
-      ApiService.requestPet(this.state.user.id, localStorage.getItem('token')).then((data)=>{
-        localStorage.setItem('pet', JSON.stringify(data));
-        if(data){
-          this.initStates(data);
-          customEvent('handleOpenEditIcon', true);
-        }
-      }).catch((err)=>{
-        console.log("Error ", err);
-      });
     }
   }
 
@@ -177,6 +185,7 @@ class MyPetView extends Component {
       name: petInfo.name,
       ownerName: petInfo.user.name,
       breed: petInfo.breed.name,
+      species: petInfo.breed.species,
       microchip: petInfo.microchip,
       born: petInfo.born,
       weight: petInfo.weight,
@@ -189,7 +198,7 @@ class MyPetView extends Component {
   }
 
   loadHealth() { 
-    if(this.state.user.id) { 
+    if(this.state.user && this.state.user.id) { 
       let day;
       let now = moment();
       ApiService.requestListHealth(`lunch/${this.state.user.id}`, this.state.jwt).then((result)=>{
@@ -506,15 +515,23 @@ class MyPetView extends Component {
             <div style={{textAlign: "right", width: "100%", padding: "15px 20px 0px 0px"}}>
               <Typography style={{fontWeight: "500"}} component="h2" variant="headline" gutterBottom>
                 {this.state.name}
+                {this.state.species == "cachorro" ? 
+                <FontAwesomeIcon icon={faDog} style={{margin: "0px 0px 0px 14px", color: "gray", fontSize: "35px"}}/>
+                :
+                <FontAwesomeIcon icon={faCat} style={{margin: "0px 0px 0px 14px", color: "gray", fontSize: "35px"}}/>
+                }
               </Typography>
               <Typography style={{color: "gray"}} variant="body1" gutterBottom>
                 {this.state.microchip}
+                <FontAwesomeIcon icon={faIdCard} style={{margin: "0px 9px 0px 20px", fontSize: "18px"}}/>
               </Typography>
               <Typography style={{marginBottom: "unset"}} variant="subheading" gutterBottom>
                 {this.state.ownerName}
+                <FontAwesomeIcon icon={faUserAstronaut} style={{margin: "0px 12px 0px 23px", color: "gray", fontSize: "18px"}}/>
               </Typography>
               <Typography variant="subheading" gutterBottom>
                 {this.state.breed}
+                <FontAwesomeIcon icon={faStars} style={{margin: "0px 10px 0px 22px", color: "gray", fontSize: "18px"}}/>
               </Typography>
             </div>
           </div>

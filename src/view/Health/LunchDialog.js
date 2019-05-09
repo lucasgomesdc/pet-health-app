@@ -9,7 +9,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Alarm from '@material-ui/icons/Alarm';
 import Slide from '@material-ui/core/Slide';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWeightHanging, faWeight } from '@fortawesome/pro-solid-svg-icons';
+import { faWeightHanging, faWeight, faCalendarDay } from '@fortawesome/pro-solid-svg-icons';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Assignment from '@material-ui/icons/Assignment';
@@ -206,6 +206,7 @@ class LunchDialog extends Component {
                   <div style={{display: "inline-block", padding: "0px 6px 0px 6px"}}>
                   {lunch.weight}g
                   </div>
+                  <FontAwesomeIcon icon={faCalendarDay} style={{marginLeft: "20px", marginRight: "10px"}}/>
                   <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.sunday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)" }}>
                     D
                   </div>

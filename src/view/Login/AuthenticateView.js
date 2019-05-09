@@ -18,6 +18,7 @@ import Slide from '@material-ui/core/Slide';
 
 import AuthenticateApiService from '../../service/AuthenticateApiService';
 import ApiService from '../../service/ApiService';
+import { customEvent } from '../../library';
 
 
 const styleSheet = {
@@ -93,6 +94,7 @@ class AuthenticateView extends Component {
   }
 
   componentDidMount() {
+    customEvent('showBar', false);
   }
 
   handleChangeView(option) {

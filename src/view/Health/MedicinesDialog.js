@@ -16,7 +16,7 @@ import Alarm from '@material-ui/icons/Alarm';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWeightHanging, faWeight } from '@fortawesome/pro-solid-svg-icons';
+import { faWeightHanging, faWeight, faCalendarDay } from '@fortawesome/pro-solid-svg-icons';
 import { faFlagCheckered } from '@fortawesome/pro-light-svg-icons';
 import DeleteIcon from '@material-ui/icons/Delete';
 import moment from 'moment';
@@ -232,6 +232,7 @@ class MedicinesDialog extends Component {
                     :
                       null
                     }
+                    <FontAwesomeIcon icon={faCalendarDay} style={{marginLeft: "20px", marginRight: "10px"}}/>
                     <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.sunday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)" }}>
                       D
                     </div>

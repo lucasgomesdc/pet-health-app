@@ -112,7 +112,12 @@ module.exports = {
   bail: true,
   // We generate sourcemaps in production. This is slow but gives good results.
   // You can exclude the *.map files from the build during deployment.
-  devtool: shouldUseSourceMap ? 'inline-source-map' : "inline-source-map",
+  
+  
+  //devtool: shouldUseSourceMap ? 'inline-source-map' : "inline-source-map",
+  
+  
+  
   // In production, we only want to load the app code.
   entry: [paths.appIndexJs],
   output: {

@@ -89,7 +89,7 @@ class PetRegister extends Component {
       born: "",
       weight: "",
       castrated: "nao",
-      media: null,
+      media: "",
       imageRaw: "",
       pedigree: "nao",
       anchorEl: null,
@@ -217,8 +217,6 @@ class PetRegister extends Component {
 
   saveRegisterPet() {
     this.validateData();
-
-
     if(this.state.foundError == false){
       let petObj = {
         name: this.state.name,
