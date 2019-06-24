@@ -211,9 +211,11 @@ class VacinesDialog extends Component {
             </div>
             <div style={{padding: "0px 8px"}}>
               <Event className={classes.iconDesign} />
-              <TextField error={this.state.errorApply && this.state.apply == ""} label="Data Aplicação" onChange={this.handleChangeInput('apply')} type="date" value={this.state.apply} style={{width: "calc(50% - 50px)", marginRight: "16px"}} />
+              <TextField error={this.state.errorApply && this.state.apply == ""} label="Data Aplicação" onChange={this.handleChangeInput('apply')} type="date" value={this.state.apply} className={classes.inputDesign}/>
+            </div>
+            <div style={{padding: "0px 8px"}}>
               <Event className={classes.iconDesign} />
-              <TextField label="Data Reaplicação" onChange={this.handleChangeInput('reapply')} type="date" value={this.state.reapply} style={{width: "calc(50% - 50px)"}}/>
+              <TextField label="Data Reaplicação" onChange={this.handleChangeInput('reapply')} type="date" value={this.state.reapply} className={classes.inputDesign}/>
             </div>   
             <div style={{padding: "0px 8px"}}>
               <FontAwesomeIcon icon={faUserMd} className={classes.iconDesign} style={{fontSize: "24px"}}/>
@@ -228,7 +230,7 @@ class VacinesDialog extends Component {
               </Button>
             </div>         
           </div>
-          <div style={{marginTop: "325px"}}>
+          <div style={{marginTop: "370px"}}>
             <Grid container style={{padding: "0px 8px 0px 8px"}} >
               {vacines}
             </Grid>

@@ -59,7 +59,7 @@ class LunchDialog extends Component {
     this.state = {
       name: "",
       time: "",
-      weight: false,
+      weight: null,
       checkedTodos: false,
       checkedSeg: false,
       checkedTer: false,
@@ -201,12 +201,12 @@ class LunchDialog extends Component {
               <Typography variant="subheading" style={{padding: "8px 0px 8px 0px"}}>
                 {lunch.name}
               </Typography>
-              <Typography variant="subheading">
+              <Typography variant="subheading" style={{fontSize: "0.98rem"}}>
                   <FontAwesomeIcon icon={faWeight} />
                   <div style={{display: "inline-block", padding: "0px 6px 0px 6px"}}>
                   {lunch.weight}g
                   </div>
-                  <FontAwesomeIcon icon={faCalendarDay} style={{marginLeft: "20px", marginRight: "10px"}}/>
+                  <FontAwesomeIcon icon={faCalendarDay} style={{marginLeft: "5px", marginRight: "10px"}}/>
                   <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: lunch.sunday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)" }}>
                     D
                   </div>
@@ -273,12 +273,13 @@ class LunchDialog extends Component {
               <FontAwesomeIcon icon={faWeight} style={{margin: "20px 8px 4px 0px", fontSize: "22px"}}/>
               <TextField label="Peso (grama)" value={this.state.weight} type="number" style={{width: "calc(50% - 50px)"}}  onChange={this.handleChangeInput('weight')}/>
             </div>
-            <div>
+            <div style={{textAlign: "center"}}>
               <Typography variant="body2" gutterBottom style={{marginTop: "12px", fontWeight: "600", textAlign: "center"}}>
                 Selecione os dias
               </Typography>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedTodos}
                   onChange={this.handleChange('checkedTodos')}
                   color="primary"
@@ -289,6 +290,7 @@ class LunchDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedSeg}
                   onChange={this.handleChange('checkedSeg')}
                   color="primary"
@@ -299,6 +301,7 @@ class LunchDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedTer}
                   onChange={this.handleChange('checkedTer')}
                   color="primary"
@@ -309,6 +312,7 @@ class LunchDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedQua}
                   onChange={this.handleChange('checkedQua')}
                   color="primary"
@@ -319,6 +323,7 @@ class LunchDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedQui}
                   onChange={this.handleChange('checkedQui')}
                   color="primary"
@@ -329,6 +334,7 @@ class LunchDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedSex}
                   onChange={this.handleChange('checkedSex')}
                   color="primary"
@@ -339,6 +345,7 @@ class LunchDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedSab}
                   onChange={this.handleChange('checkedSab')}
                   color="primary"
@@ -349,6 +356,7 @@ class LunchDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedDom}
                   onChange={this.handleChange('checkedDom')}
                   color="primary"

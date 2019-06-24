@@ -33,11 +33,14 @@ class MeetingsDialog extends Component {
       meetingList: [],
       meeting: JSON.parse(localStorage.getItem('meeting')),
       pet: JSON.parse(localStorage.getItem('pet')),
-      jwt: localStorage.getItem('token')
+      jwt: localStorage.getItem('token'),
+      loading: false
     }
   }
 
   componentDidMount() {
+    this.state.loading = true;
+    this.setState(this.state);
     GPSService.initGPS((position)=>{
       this.state.gps = { 
         latitude: position.coords.latitude, 
@@ -48,6 +51,7 @@ class MeetingsDialog extends Component {
       ApiService.requestListMeetings(obj, localStorage.getItem('token')).then((result)=>{
         if(result){
           this.state.meetingList = result;
+          this.state.loading = false;
         }
         this.setState(this.state);
         if(this.state.meeting != null) {
@@ -58,12 +62,18 @@ class MeetingsDialog extends Component {
           }
           ApiService.requestUpdateMeetings(this.state.meeting.user, meetingObj, this.state.jwt).then((result) => {
             localStorage.setItem('meeting', JSON.stringify(result.meeting));
+            this.state.loading = false;
+            this.setState(this.state);
           }).catch((err)=>{
             console.log(err);
+            this.state.loading = false;
+            this.setState(this.state);
           });
         }        
       }).catch((err)=>{
         console.log(err);
+        this.state.loading = false;
+        this.setState(this.state);
       });
     });
   }
@@ -164,12 +174,12 @@ class MeetingsDialog extends Component {
             </Toolbar>
           </AppBar>
           <div style={{width: "100%", marginTop: "64px"}}> 
-            {listItem && listItem.length > 0 ? 
-              listItem 
-              : 
+            {this.state.loading ? 
               <div style={{width: "100%", textAlign: "center", marginTop: "22px"}}>
                 <CircularProgress className={classes.progress} />
               </div>
+              : 
+              listItem
             }
           </div>
         </Dialog>

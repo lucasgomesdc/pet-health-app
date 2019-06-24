@@ -213,7 +213,7 @@ class MedicinesDialog extends Component {
       return(
         <Grid item xs={12} style={{marginBottom: "4px"}}>
           <Paper style={{borderRight: '5px solid #80deea'}}>
-            <Grid container style={{height: "80px"}}>
+            <Grid container style={{height: "90px"}}>
               <Grid item xs={2}>
                 <Typography variant="display1" style={{fontSize: "24px", textAlign: "center", margin: "26px 0px 26px 0px"}}>
                   {medicine.time}
@@ -232,7 +232,9 @@ class MedicinesDialog extends Component {
                     :
                       null
                     }
-                    <FontAwesomeIcon icon={faCalendarDay} style={{marginLeft: "20px", marginRight: "10px"}}/>
+                </Typography>
+                <Typography>
+                    <FontAwesomeIcon icon={faCalendarDay} style={{marginRight: "10px"}}/>
                     <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.sunday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)" }}>
                       D
                     </div>
@@ -291,22 +293,25 @@ class MedicinesDialog extends Component {
             </Typography>
             <div style={{padding: "0px 8px"}}>
               <Assignment className={classes.iconDesign} />
-              <TextField error={this.state.errorName && this.state.name == ""} label="Nome do Remédio" onChange={this.handleChangeInput('name')} value={this.state.name} style={{width: "calc(60% - 50px)", marginRight: "16px"}} />
+              <TextField error={this.state.errorName && this.state.name == ""} label="Nome do Remédio" onChange={this.handleChangeInput('name')} value={this.state.name} className={classes.inputDesign} />
+            </div>
+            <div style={{padding: "0px 8px"}}>
               <Alarm className={classes.iconDesign} />
-              <TextField error={this.state.errorTime && this.state.time == ""} label="Definir Hora" onChange={this.handleChangeInput('time')} value={this.state.time} type="time" style={{width: "calc(40% - 50px)", marginRight: "16px"}}/>
+              <TextField error={this.state.errorTime && this.state.time == ""} label="Definir Hora" onChange={this.handleChangeInput('time')} value={this.state.time} type="time" className={classes.inputDesign} />
             </div>
             <div style={{padding: "0px 8px"}}>
               <Event className={classes.iconDesign} />
-              <TextField error={this.state.errorStart && this.state.start == ""} label="Data do Começo" onChange={this.handleChangeInput('start')} type="date" value={this.state.start} style={{width: "calc(50% - 50px)", marginRight: "16px"}} />
+              <TextField error={this.state.errorStart && this.state.start == ""} label="Data Começo" onChange={this.handleChangeInput('start')} type="date" value={this.state.start} style={{width: "calc(50% - 50px)", marginRight: "16px"}} />
               <Event className={classes.iconDesign} />
-              <TextField label="Data do Fim" onChange={this.handleChangeInput('end')} type="date" value={this.state.end} style={{width: "calc(50% - 50px)"}}/>
+              <TextField label="Data Fim" onChange={this.handleChangeInput('end')} type="date" value={this.state.end} style={{width: "calc(50% - 50px)"}}/>
             </div>
-            <div>
+            <div style={{textAlign: "center"}}>
               <Typography variant="body2" gutterBottom style={{marginTop: "12px", fontWeight: "600", textAlign: "center"}}>
                 Selecione os dias
               </Typography>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedTodos}
                   onChange={this.handleChange('checkedTodos')}
                   color="primary"
@@ -317,6 +322,7 @@ class MedicinesDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedSeg}
                   onChange={this.handleChange('checkedSeg')}
                   color="primary"
@@ -327,6 +333,7 @@ class MedicinesDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedTer}
                   onChange={this.handleChange('checkedTer')}
                   color="primary"
@@ -337,6 +344,7 @@ class MedicinesDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedQua}
                   onChange={this.handleChange('checkedQua')}
                   color="primary"
@@ -347,6 +355,7 @@ class MedicinesDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedQui}
                   onChange={this.handleChange('checkedQui')}
                   color="primary"
@@ -357,6 +366,7 @@ class MedicinesDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedSex}
                   onChange={this.handleChange('checkedSex')}
                   color="primary"
@@ -367,6 +377,7 @@ class MedicinesDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedSab}
                   onChange={this.handleChange('checkedSab')}
                   color="primary"
@@ -377,6 +388,7 @@ class MedicinesDialog extends Component {
               </div>
               <div className={classes.dayCheckbox}>
                 <Checkbox
+                  style={{width: "16px", height: "16px"}}
                   checked={this.state.checkedDom}
                   onChange={this.handleChange('checkedDom')}
                   color="primary"
@@ -395,7 +407,7 @@ class MedicinesDialog extends Component {
               </Button>
             </div>
           </div>
-          <div style={{marginTop: "382px"}}>
+          <div style={{marginTop: "420px"}}>
             <Grid container style={{padding: "0px 8px 0px 8px"}}>
               {medicines}
             </Grid>

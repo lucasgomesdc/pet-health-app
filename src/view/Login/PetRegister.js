@@ -95,7 +95,9 @@ class PetRegister extends Component {
       anchorEl: null,
       animalBreedList: [],
       foundError: false,
-      userId: null
+      userId: null,
+      imageHash: Date.now(),
+      disableSave: false
     }
     this.breedList = null
   }
@@ -202,6 +204,8 @@ class PetRegister extends Component {
   }
 
   handleSendAWS(imageRaw){
+    this.state.disableSave = true;
+    this.setState(this.state);
     const jwt = localStorage.getItem("token");
     let imageObj = {
       mediaRaw: imageRaw,
@@ -209,9 +213,13 @@ class PetRegister extends Component {
     }
     UploadImageService.sendImageToAWS(Object.assign({}, imageObj), jwt).then((result)=>{
       this.state.media = result.Location;
+      this.state.imageHash = Date.now();
+      this.state.disableSave = false;
       this.setState(this.state);
     }).catch((err)=>{
       console.log(err);
+      this.state.disableSave = false;
+      this.setState(this.state);
     });
   }
 
@@ -305,7 +313,7 @@ class PetRegister extends Component {
             <div className={classes.avatarWithImage}>
               <Avatar 
                 alt="Teste" 
-                src={this.state.media ? this.state.media : this.state.imageRaw} 
+                src={this.state.media ? `${this.state.media}?${this.state.imageHash}` : this.state.imageRaw} 
                 className={classes.image} 
               />
               <Fab onClick={()=>{this.deleteImage()}}size="small" color="secondary" aria-label="Remove" className={classes.cameraButton}>
@@ -476,6 +484,7 @@ class PetRegister extends Component {
               color="primary"
               aria-label="Concluir"
               onClick={()=>{this.saveRegisterPet()}}
+              disable={this.state.disableSave}
             >
               <FontAwesomeIcon icon={faCheck} style={{marginRight: "12px"}}/>
               Concluir

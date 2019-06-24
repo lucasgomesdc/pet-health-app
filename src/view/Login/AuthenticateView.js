@@ -34,15 +34,15 @@ const styleSheet = {
     alignItems: "flex-end"
   },
   loginPaper: { 
-    height: "300px",
+    height: "274px",
     width: "calc(100% - 50px)",
-    margin: "0px auto 50px",
+    margin: "0px auto 25px",
     position: "relative"
   },
   registerPaper: {
-    height: "415px",
+    height: "386px",
     width: "calc(100% - 50px)",
-    margin: "0px auto 50px",
+    margin: "0px auto 25px",
     position: "relative"
   },
   iconDesign: {
@@ -286,7 +286,7 @@ class AuthenticateView extends Component {
             <TextField label="E-mail" value={this.state.emailRegister} className={classes.textFieldRegister} onChange={(event)=>this.handleChangeInput('emailRegister', event)}/>
           </div>
           <div className={classes.inputDesign}>
-            <TextField label="Repita a senha" value={this.state.passwordRegister} className={classes.textFieldRegister} type={'password'} onChange={(event)=>this.handleChangeInput('passwordRegister', event)}/>
+            <TextField label="Digite a senha" value={this.state.passwordRegister} className={classes.textFieldRegister} type={'password'} onChange={(event)=>this.handleChangeInput('passwordRegister', event)}/>
           </div>
           <div className={classes.inputDesign}>
             <TextField label="Repita a senha" value={this.state.repeatPasswordRegister} className={classes.textFieldRegister} type={'password'} onChange={(event)=>this.handleChangeInput('repeatPasswordRegister', event)}/>
@@ -305,7 +305,7 @@ class AuthenticateView extends Component {
               Registrar
             </Button>
           </div>
-          <div style={{textAlign: "center", margin: "6px 0px 6px 0px"}}>  
+          <div style={{textAlign: "center", margin: "4px 0px 4px 0px"}}>  
             Já tem uma conta? 
             <Button onClick={()=>{this.handleChangeView("sign")}} color="primary" style={{fontWeight: "600"}}>
               Entrar

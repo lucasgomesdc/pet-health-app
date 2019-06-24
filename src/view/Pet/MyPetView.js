@@ -15,6 +15,7 @@ import Typography from '@material-ui/core/Typography'
 import Fab from '@material-ui/core/Fab';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMars, faChartNetwork, faVenus, faWeight, faUserMd, faFlagCheckered, faCalendarDay, faDog, faIdCard, faUserAstronaut, faStars, faCat } from '@fortawesome/pro-solid-svg-icons';
+import { faTimesCircle, faCheckCircle } from '@fortawesome/pro-regular-svg-icons';
 import { customEvent } from '../../library';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ExpandLess from '@material-ui/icons/ExpandLess';
@@ -38,9 +39,8 @@ import moment from 'moment';
 
 const styleSheet = {
   bigAvatar: {
-    marginLeft: "20px",
-    width: "150px",
-    height: "150px",
+    width: "130px",
+    height: "130px",
     fontSize: "40px"
   },
   row: {
@@ -110,7 +110,8 @@ class MyPetView extends Component {
       editDialog: false,
       loading: false,
       user: JSON.parse(localStorage.getItem('user')),
-      jwt: localStorage.getItem('token')
+      jwt: localStorage.getItem('token'),
+      imageHash: Date.now()
     }
 
     this.handleEditPetRegisterFn = (event)=>{this.handleEditPetRegister(event.detail)};
@@ -199,12 +200,11 @@ class MyPetView extends Component {
 
   loadHealth() { 
     if(this.state.user && this.state.user.id) { 
-      let day;
       let now = moment();
+      let day = now.format('dddd').toLowerCase();
       ApiService.requestListHealth(`lunch/${this.state.user.id}`, this.state.jwt).then((result)=>{
         let lunches = result.lunches ? result.lunches : [];
         lunches.forEach((lunch)=>{
-          day = now.format('dddd').toLowerCase();
           if(lunch[day]){
             this.state.listLunches.push(lunch);
           }
@@ -228,10 +228,10 @@ class MyPetView extends Component {
           ApiService.requestListHealth(`vacine/${this.state.user.id}`, this.state.jwt).then((result)=>{
             let vacines = result.vacines ? result.vacines : [];
             vacines.forEach((vacine)=>{
-              let apply = moment(moment.utc(vacine.apply).format('YYYY-MM-DD'));
+              let apply = moment(moment.utc(vacine.apply).format('dddd'));
               let reapply;
               if(vacine.reapply) {
-                reapply = moment(moment.utc(vacine.reapply).format('YYYY-MM-DD'));
+                reapply = moment(moment.utc(vacine.reapply).format('dddd'));
                 if(reapply == day) {
                   this.state.listVacines.push(vacine);
                 }
@@ -314,6 +314,17 @@ class MyPetView extends Component {
 
   saveNumber(){
     let number = this.state.numberPhone.replace(/\D+/g, '');
+
+    if(number[2] >= 6) {
+      let celular = "";
+      for(let x = 0; x < number.length; x++) {
+        if(x == 2){
+          celular+= "9";
+        }
+        celular+= number[x];
+      }
+      number = celular;
+    }
     let userObj = { 
       contactEmergency: number
     }
@@ -359,20 +370,20 @@ class MyPetView extends Component {
                   {medicine.time}
                 </Typography>
               </Grid>
-              <Grid item xs={8} style={{padding: "0px 0px 0px 12px"}}>
+              <Grid item xs={10} style={{padding: "0px 0px 0px 12px"}}>
                 <Typography variant="subheading" style={{padding: "8px 0px 8px 0px"}}>
                   {medicine.name}
                 </Typography>
-                <Typography variant="subheading">
+                <Typography variant="subheading" style={{fontSize: "0.9rem"}}>
                     <FontAwesomeIcon icon={faFlagCheckered} />
                     {dataEnd ? 
-                      <div style={{display: "inline-block", padding: "0px 6px 0px 6px", marginRight: "22px"}}>
+                      <div style={{display: "inline-block", padding: "0px 6px 0px 6px"}}>
                         {dataEnd}
                       </div>
                     :
                       null
                     }
-                    <FontAwesomeIcon icon={faCalendarDay} style={{marginLeft: "20px", marginRight: "10px"}}/>
+                    <FontAwesomeIcon icon={faCalendarDay} style={{marginLeft: "10px", marginRight: "10px"}}/>
                     <div style={{display: "inline-block", padding: "0px 3px 0px 3px", color: medicine.sunday === true ? "rgba(0,0,0,1)" : "rgba(0,0,0,0.05)" }}>
                       D
                     </div>
@@ -396,8 +407,6 @@ class MyPetView extends Component {
                     </div>
                 </Typography>
               </Grid>
-              <Grid item xs={2} style={{textAlign: "right"}}>
-              </Grid>
             </Grid>
           </Paper>
         </Grid>
@@ -414,7 +423,7 @@ class MyPetView extends Component {
                 {lunch.time}
               </Typography>
             </Grid>
-            <Grid item xs={8} style={{padding: "0px 12px 0px 12px"}}>
+            <Grid item xs={10} style={{padding: "0px 12px 0px 12px"}}>
               <Typography variant="subheading" style={{padding: "8px 0px 8px 0px"}}>
                 {lunch.name}
               </Typography>
@@ -447,8 +456,6 @@ class MyPetView extends Component {
                   </div>
               </Typography>
             </Grid>
-            <Grid item xs={2} style={{textAlign: "right"}}>
-            </Grid>
           </Grid>
         </Paper>
       </Grid>
@@ -476,7 +483,7 @@ class MyPetView extends Component {
                   {dataReApply}
                 </Typography>
               </Grid>
-              <Grid item xs={6} style={{padding: "0px 12px 0px 12px"}}>
+              <Grid item xs={8} style={{padding: "0px 12px 0px 12px"}}>
                 <Typography variant="title" style={{padding: "8px 0px 8px 0px"}}>
                   {vacine.name}
                 </Typography>
@@ -484,8 +491,6 @@ class MyPetView extends Component {
                   <FontAwesomeIcon icon={faUserMd} style={{marginRight: "8px"}}/>
                   {vacine.applyBy}
                 </Typography>
-              </Grid>
-              <Grid item xs={2} style={{textAlign: "right"}}>
               </Grid>
             </Grid>
           </Paper>
@@ -500,7 +505,7 @@ class MyPetView extends Component {
             {this.state.media ? 
             <Avatar
               alt="Pet Picture"
-              src={this.state.media}
+              src={`${this.state.media}?${this.state.imageHash}`}
               className={classes.bigAvatar}
             />
             :
@@ -512,7 +517,7 @@ class MyPetView extends Component {
               <Camera className={classes.cameraIcon}/>
             </Avatar>
             }
-            <div style={{textAlign: "right", width: "100%", padding: "15px 20px 0px 0px"}}>
+            <div style={{textAlign: "right", width: "100%"}}>
               <Typography style={{fontWeight: "500"}} component="h2" variant="headline" gutterBottom>
                 {this.state.name}
                 {this.state.species == "cachorro" ? 
@@ -521,10 +526,14 @@ class MyPetView extends Component {
                 <FontAwesomeIcon icon={faCat} style={{margin: "0px 0px 0px 14px", color: "gray", fontSize: "35px"}}/>
                 }
               </Typography>
-              <Typography style={{color: "gray"}} variant="body1" gutterBottom>
-                {this.state.microchip}
-                <FontAwesomeIcon icon={faIdCard} style={{margin: "0px 9px 0px 20px", fontSize: "18px"}}/>
-              </Typography>
+              {this.state.microchip ? 
+                <Typography style={{color: "gray"}} variant="body1" gutterBottom>
+                  {this.state.microchip}
+                  <FontAwesomeIcon icon={faIdCard} style={{margin: "0px 9px 0px 20px", fontSize: "18px"}}/>
+                </Typography>
+              :
+                null
+              }
               <Typography style={{marginBottom: "unset"}} variant="subheading" gutterBottom>
                 {this.state.ownerName}
                 <FontAwesomeIcon icon={faUserAstronaut} style={{margin: "0px 12px 0px 23px", color: "gray", fontSize: "18px"}}/>
@@ -537,12 +546,16 @@ class MyPetView extends Component {
           </div>
           {this.state.showDetails ? 
             <div style={{textAlign: "center", margin: "8px auto"}}>
-              <div id="weight" className={classes.details} style={{width: "60px"}}>
-                <FontAwesomeIcon icon={faWeight} style={{color: "rgba(0, 0, 0, 0.54)", fontSize: "25px"}}/>
-                <div>
-                {this.state.weight}kg
+              {this.state.weight ? 
+                <div id="weight" className={classes.details} style={{width: "60px"}}>
+                  <FontAwesomeIcon icon={faWeight} style={{color: "rgba(0, 0, 0, 0.54)", fontSize: "25px"}}/>
+                  <div>
+                  {this.state.weight}kg
+                  </div>
                 </div>
-              </div>
+              :
+                null
+              }
               <div id="gender" className={classes.details}>
                 {this.state.gender == "Macho" ? 
                   <FontAwesomeIcon icon={faMars} style={{color: "rgba(0, 0, 0, 0.54)", fontSize: "30px"}}/>
@@ -553,17 +566,23 @@ class MyPetView extends Component {
                   {this.state.gender}
                 </div>
               </div>
-              <div id="pedigree" className={classes.details}>
-                <FontAwesomeIcon icon={faChartNetwork} style={{color: "rgba(0, 0, 0, 0.54)", fontSize: "25px"}}/>
-                <div>
-                  Pedigree
+              {this.state.pedigree == "Sim" ?
+                <div id="pedigree" className={classes.details}>
+                  <FontAwesomeIcon icon={faChartNetwork} style={{color: "rgba(0, 0, 0, 0.54)", fontSize: "25px"}}/>
+                  <div>
+                    Pedigree
+                  </div>
                 </div>
-              </div>
+              :
+                null
+              }
               <div id="castrated" className={classes.details}>
-                Castrado 
-                <div>
-                  {this.state.castrated}
-                </div>
+              {this.state.castrated == "Sim" ? 
+                <FontAwesomeIcon icon={faTimesCircle} style={{color: "rgba(0, 0, 0, 0.54)", fontSize: "25px"}}/>
+              :
+                <FontAwesomeIcon icon={faCheckCircle} style={{color: "rgba(0, 0, 0, 0.54)", fontSize: "25px"}}/>
+              }
+              Castrado
               </div>
             </div>
           :
@@ -581,7 +600,7 @@ class MyPetView extends Component {
         </Paper>
         <Paper style={{margin: "8px 0px", height: "64px", position: "relative"}}>
           <Typography variant="h5" gutterBottom style={{position: "absolute", left: "8px", top: "19px", fontSize:"18px"}}>
-            Número de Emergência
+            Emergência
           </Typography>
           {this.state.user.contactEmergency ? 
             <Fab

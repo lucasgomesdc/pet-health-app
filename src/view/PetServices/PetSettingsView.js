@@ -9,6 +9,9 @@ import TextField from '@material-ui/core/TextField';
 import { customEvent } from '../../library';
 import GPSService from '../../service/GPSService';
 import ApiService from '../../service/ApiService';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
 
 const styleSheet = {
 
@@ -23,7 +26,8 @@ class PetSettingsView extends Component {
       instagram: "",
       user: JSON.parse(localStorage.getItem('user')),
       pet: JSON.parse(localStorage.getItem('pet')),
-      GPS:  JSON.parse(localStorage.getItem('GPS'))
+      GPS:  JSON.parse(localStorage.getItem('GPS')),
+      open: false
     }
   }
 
@@ -40,6 +44,7 @@ class PetSettingsView extends Component {
   handleChangeGPS(event) {
     this.state.checkedMeetings = event.target.checked;
     if(event.target.checked){
+      this.openLoadingDialog();
       GPSService.initGPS((position)=>{
         this.state.GPS = {
           latitude: position.coords.latitude,
@@ -48,8 +53,10 @@ class PetSettingsView extends Component {
         localStorage.setItem('GPS', JSON.stringify(this.state.GPS));
         this.state.changed = true;
         this.setState(this.state);
+        this.closeLoadingDialog();
       },(error)=>{
         console.log(error);
+        this.closeLoadingDialog();
       });
     } else {
       this.state.changed = true;
@@ -76,6 +83,7 @@ class PetSettingsView extends Component {
   }
 
   saveSettings(){
+    this.openLoadingDialog();
     let obj = {
       meetings: this.state.checkedMeetings,
       instagram: this.state.instagram
@@ -103,8 +111,10 @@ class PetSettingsView extends Component {
           }
           ApiService.requestUpdateMeetings(result.meeting[0].user, meetingObj, jwt).then((result) => {
             localStorage.setItem('meeting', JSON.stringify(result.meeting));
+            this.closeLoadingDialog();
           }).catch((err)=>{
             console.log(err);
+            this.closeLoadingDialog();
           });
         } else if (result.code == "404") {
           let meetingObj = { 
@@ -117,8 +127,10 @@ class PetSettingsView extends Component {
           }
           ApiService.requestRegisterMeetings(meetingObj, jwt).then((result) => {
             localStorage.setItem('meeting', JSON.stringify(result.meeting));
+            this.closeLoadingDialog();
           }).catch((err)=>{
             console.log(err);
+            this.closeLoadingDialog();
           });
         }
       });
@@ -127,15 +139,28 @@ class PetSettingsView extends Component {
         if(result.code == "302"){
           ApiService.requestDeleteMeetings(this.state.user.id, jwt).then(()=>{
             localStorage.setItem('meeting', null);
+            this.closeLoadingDialog();
           }).catch((err)=>{
             console.log(err);
+            this.closeLoadingDialog();
           });
         }
       }).catch((err)=>{
         console.log(err);
+        this.closeLoadingDialog();
       });
     }
   }
+
+  openLoadingDialog() {
+    this.state.open = true;
+    this.setState(this.state);
+  };
+
+  closeLoadingDialog() {
+    this.state.open = false;
+    this.setState(this.state);
+  };
 
   render(){
     //const { classes } = this.props;
@@ -181,17 +206,25 @@ class PetSettingsView extends Component {
             Sair
           </Button>
         </div>
-        <div>
-          <Typography style={{
-            padding: "0px 10px",
-            textAlign: "justify",
-            position: "absolute",
-            bottom: "100px"
-          }}>
-            Aplicativo desenvolvido como fim educacional em um Trabalho de Conclusão de Curso do aluno Lucas Eduardo Gomes orientado por Felipe Domingos da Cunha na 
-  Pontifícia Universidade Católica de Minas Gerais
-          </Typography>
-        </div>
+        <Typography style={{
+          marginTop: "20px",
+          padding: "0px 10px",
+          textAlign: "justify",
+        }}>
+          Aplicativo desenvolvido como fim educacional em um Trabalho de Conclusão de Curso do aluno Lucas Eduardo Gomes orientado por Felipe Domingos da Cunha na 
+Pontifícia Universidade Católica de Minas Gerais
+        </Typography>
+        <Dialog
+          open={this.state.open}
+          onClose={this.handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogContent>
+            <CircularProgress />
+          </DialogContent>
+        </Dialog>
+
       </div>
     );
   }

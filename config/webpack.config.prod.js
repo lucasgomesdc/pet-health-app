@@ -114,7 +114,8 @@ module.exports = {
   // You can exclude the *.map files from the build during deployment.
   
   
-  //devtool: shouldUseSourceMap ? 'inline-source-map' : "inline-source-map",
+  
+  devtool: shouldUseSourceMap ? 'inline-source-map' : "inline-source-map",
   
   
   

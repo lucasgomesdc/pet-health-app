@@ -7,10 +7,11 @@ class CameraService {
         destinationType: navigator.camera.DestinationType.DATA_URL,
         sourceType: navigator.camera.PictureSourceType.CAMERA,
         mediaType: navigator.camera.MediaType.PICTURE,
-        encodingType: navigator.camera.EncodingType.PNG,
+        encodingType: navigator.camera.EncodingType.JPEG,
         cameraDirection: navigator.camera.Direction.BACK,
-        targetWidth: 500,
-        targetWidth: 500,
+        targetWidth: 720,
+        saveToPhotoAlbum: true,
+        correctOrientation: true
       }
       navigator.camera.getPicture(function(imageURI){
         let imageResponse = imageURI;
@@ -28,11 +29,11 @@ class CameraService {
         destinationType: navigator.camera.DestinationType.DATA_URL,
         sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY,
         mediaType: navigator.camera.MediaType.PICTURE,
-        encodingType: navigator.camera.EncodingType.PNG,
+        encodingType: navigator.camera.EncodingType.JPEG,
         cameraDirection: navigator.camera.Direction.BACK,
-        targetWidth: 400,
-        targetWidth: 400,
+        targetWidth: 720,
         allowEdit: true,
+        correctOrientation: true
       }
       navigator.camera.getPicture(function(imageURI){
         let imageResponse = imageURI;

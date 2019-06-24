@@ -80,11 +80,11 @@ class AppTopBar extends Component {
   }
 
   handleClickOpen = () => {
-    this.setState({ open: true });
+    this.setState({ open: true, name: "", address: "", });
   };
 
   handleClose = () => {
-    this.setState({ open: false });
+    this.setState({ open: false, sendSuccess: false });
   };
 
   handleChangeInput = prop => event => {
@@ -156,7 +156,7 @@ class AppTopBar extends Component {
                 <FontAwesomeIcon icon={ faCommentAltSmile } style={{color: "rgba(0, 0, 0, 0.54)", width: "50px", height: "50px"}}/>
               </div>
               <Typography style={{textAlign: "center"}}>
-                Obrigado pela sugestão, vou analizar o local!
+                Obrigado pela sugestão, vou analisar o local!
               </Typography>
             </DialogContent>
           :
@@ -179,14 +179,22 @@ class AppTopBar extends Component {
               />
             </DialogContent>
           }
-          <DialogActions>
-            <Button onClick={this.handleClose} color="secondary">
-              Cancelar
-            </Button>
-            <Button onClick={()=>{this.saveSuggestion()}} color="primary">
-              Enviar
-            </Button>
-          </DialogActions>
+          {this.state.sendSuccess ?
+            <DialogActions>
+              <Button onClick={this.handleClose} color="primary">
+                Fechar
+              </Button>
+            </DialogActions>
+          :
+            <DialogActions>
+              <Button onClick={this.handleClose} color="secondary">
+                Cancelar
+              </Button>
+              <Button onClick={()=>{this.saveSuggestion()}} color="primary">
+                Enviar
+              </Button>
+            </DialogActions>
+          }
         </Dialog>
       </div>
     );

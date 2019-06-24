@@ -267,17 +267,31 @@ class LocalView extends Component {
         </div>
         :
         <div>
-          <Paper style={{
-            margin: "11px",
-            padding: "12px"
-          }}>
-            <Typography variant="h5" gutterBottom>
-              Locais Pet Friendly 
-            </Typography>
-            <Typography>
-              Seu animal é bem-vindo :)
-            </Typography>
-          </Paper>
+          {locals.length > 0 ? 
+            <Paper style={{
+              margin: "11px",
+              padding: "12px"
+            }}>
+              <Typography variant="h5" gutterBottom>
+                Locais Pet Friendly 
+              </Typography>
+              <Typography>
+                Seu animal é bem-vindo :)
+              </Typography>
+            </Paper>
+          :
+            <Paper style={{
+              margin: "11px",
+              padding: "12px"
+            }}>
+              <Typography variant="h5" gutterBottom style={{marginBottom: "28px"}}>
+                Que pena! <br/>Não encontrei nenhum local próximo de você :(
+              </Typography>
+              <Typography>
+                Clique no <div style={{display: "inline", fontWeight: "bold"}}>+</div> para sugerir um local que você conheça
+              </Typography>
+            </Paper>
+          }
           {locals}
         </div>
         }
