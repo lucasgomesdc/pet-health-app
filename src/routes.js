@@ -1,16 +1,36 @@
 import React from 'react';
-import { Router, Route, Redirect, hashHistory } from 'react-router';
+import { Switch , Route, Redirect } from 'react-router';
+import { isAuthenticated } from './library/auth';
 
 import MyPetView from './view/Pet/MyPetView';
 import HealthView from './view/Health/HealthView';
 import LocalView from './view/Locals/LocalView';
-import PetServiceView from './view/PetServices/PetServiceView';
+import PetSettingsView from './view/PetServices/PetSettingsView';
+import AuthenticateView from './view/Login/AuthenticateView';
+import PetRegister from './view/Login/PetRegister';
 
-export default () => (
-  <Router history={hashHistory}>
-    <Route path='/' component={MyPetView}/>
-    <Route path='/health' component={HealthView}/>
-    <Route path='/local' component={LocalView}/>
-    <Route path='/petService' component={PetServiceView}/>
-  </Router>
+const PrivateRoute = ({ component: Component, ...rest}) => (
+  <Route
+    {...rest}
+    render={props=> 
+      isAuthenticated() ? (
+        <Component {...props} />
+      ) : (
+        <Redirect to={{ pathname: '/auth', state: { from: props.location } }} />
+      )
+    }
+  />
 );
+
+const Routes = () => (
+  <Switch>
+    <PrivateRoute exact path='/' component={MyPetView}/>
+    <PrivateRoute exact path='/health' component={HealthView}/>
+    <PrivateRoute exact path='/local' component={LocalView}/>
+    <PrivateRoute exact path='/petService' component={PetSettingsView}/>
+    <PrivateRoute exact path='/petRegister' component={PetRegister} />
+    <Route exact path='/auth' component={AuthenticateView} />
+  </Switch>
+);
+
+export default Routes;

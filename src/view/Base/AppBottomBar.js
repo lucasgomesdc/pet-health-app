@@ -7,17 +7,20 @@ import RestoreIcon from '@material-ui/icons/Restore';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import Pets from '@material-ui/icons/Pets';
-import Map from '@material-ui/icons/Map';
+import Place from '@material-ui/icons/Place';
 import Store from '@material-ui/icons/Store';
 import Settings from '@material-ui/icons/Settings';
-import { hashHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const styleSheet = {
   bottomBar: {
-    position: "absolute",
+    position: "fixed",
     width: "100%", 
     bottom: "0%",
     boxShadow: "0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12)"
+  },
+  menuNav: { 
+    minWidth: "unset",
   }
 }
 
@@ -26,29 +29,34 @@ class AppBottomBar extends Component {
     super(props, context);
     this.props = props;
     this.state = {
-      value: 'recents'
+      value: 'home',
     };
+    this.selectActiveAppBottomBarFn = (event)=>{this.selectActiveAppBottomBar(event.detail)};
+    window.addEventListener('selectActiveAppBottomBar', this.selectActiveAppBottomBarFn);
   }
 
-  componentDidMount() {
+  selectActiveAppBottomBar(value) {
+    this.state.value = value;
+    this.setState(this.state);
   }
 
-  handleChange = (event, page) => {
-    this.setState({ page });
-    let uri = "/"+page;
-    hashHistory.push(uri);
+  componentWillUnmount() { 
+    window.removeEventListener('selectActiveAppBottomBar', this.selectActiveAppBottomBarFn);
+  }
+
+  handleChange = (event, value) => {
+    this.setState({ value });
   };
 
   render(){
     const { classes } = this.props;
 
     return(
-      <BottomNavigation value={this.state.page} onChange={this.handleChange} className={classes.bottomBar}>
-        <BottomNavigationAction value="" icon={<Pets />} />
-        <BottomNavigationAction value="health" icon={<FavoriteIcon />} />
-        <BottomNavigationAction value="local" icon={<Map />} />
-        <BottomNavigationAction value="petService" icon={<Store />} />
-        <BottomNavigationAction value="test" icon={<Settings />} />
+      <BottomNavigation value={this.state.value} onChange={this.handleChange} className={classes.bottomBar} showLabels >
+        <BottomNavigationAction className={classes.menuNav} label="Meu Pet" component={Link} to="/" value="home" icon={<Pets />} />
+        <BottomNavigationAction className={classes.menuNav} label="Saúde" component={Link} to="/health" value="health" icon={<FavoriteIcon />} />
+        <BottomNavigationAction className={classes.menuNav} label="Lugares" component={Link} to="/local" value="local" icon={<Place />} />
+        <BottomNavigationAction className={classes.menuNav} label="Ajustes" component={Link} to="/petService" value="petService" icon={<Settings />} />
       </BottomNavigation>
     );
   }
